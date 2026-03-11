@@ -8,7 +8,7 @@ export async function handler(event) {
     return { statusCode: 400, body: JSON.stringify({ error: 'Song is required' }) };
   }
 
-  const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AlzaSyBnWlpZ4g7d6gUSwGID8VabVPYX9ZpW540';
+  const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyBnWlpZ4g7d6gUSwGID8VabVPYX9ZpW540';
 
   const prompt = `You are an expert guitarist and amp technician specializing in the Fender Mustang LT 25 amplifier.
 
@@ -48,7 +48,7 @@ Return ONLY valid JSON, no markdown, no explanation:
 
   try {
     const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
