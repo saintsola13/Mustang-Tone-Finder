@@ -1,79 +1,420 @@
-// Fender Mustang LT 25 - Song Tone Database
-// No API key needed. Pure local matching + genre fallback.
+// Fender Mustang LT 25 — Song Tone Database
+// Rhythm + Solo modes, full effect parameter details
 
 const SONGS = [
-  // CLASSIC ROCK
-  { song: "smells like teen spirit", artist: "nirvana", preset: "JCM", gain: 8, treble: 6, bass: 7, volume: 7, master: 6, stompbox: "None", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Room", confidence: "high", notes: "Crank the gain, scoop the mids slightly. Classic grunge wall of sound." },
-  { song: "come as you are", artist: "nirvana", preset: "JCM", gain: 6, treble: 5, bass: 6, volume: 6, master: 6, stompbox: "Chorus", modulation: "Chorus", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Room", confidence: "high", notes: "Add chorus for that watery intro tone. Keep gain moderate." },
-  { song: "back in black", artist: "ac/dc", preset: "Plexi Drive", gain: 6, treble: 7, bass: 6, volume: 8, master: 7, stompbox: "None", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Spring", confidence: "high", notes: "Bright and punchy. Let the amp breathe — no effects needed." },
-  { song: "highway to hell", artist: "ac/dc", preset: "Plexi Drive", gain: 6, treble: 7, bass: 6, volume: 8, master: 7, stompbox: "None", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Spring", confidence: "high", notes: "Same AC/DC formula — bright Plexi tone, let it rip." },
-  { song: "whole lotta love", artist: "led zeppelin", preset: "Plexi Drive", gain: 7, treble: 6, bass: 7, volume: 7, master: 7, stompbox: "None", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Room", confidence: "high", notes: "Fat and aggressive. Boost mids for that Page crunch." },
-  { song: "stairway to heaven", artist: "led zeppelin", preset: "Boutique", gain: 4, treble: 6, bass: 5, volume: 6, master: 5, stompbox: "None", modulation: "None", delay: "Analog Delay", delay_time_ms: 350, fx: 4, reverb_type: "Hall", confidence: "high", notes: "Clean fingerpicking tone to start, then swell gain toward the solo." },
-  { song: "sweet child o mine", artist: "guns n roses", preset: "JCM", gain: 7, treble: 6, bass: 6, volume: 7, master: 7, stompbox: "None", modulation: "Chorus", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Room", confidence: "high", notes: "JCM800 vibe. Chorus adds width to Slash's tone." },
-  { song: "purple haze", artist: "jimi hendrix", preset: "Plexi Drive", gain: 7, treble: 7, bass: 5, volume: 7, master: 7, stompbox: "Fuzz", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Spring", confidence: "high", notes: "Fuzz face into a Marshall stack. Spring reverb for era-correct tone." },
-  { song: "voodoo child", artist: "jimi hendrix", preset: "Plexi Drive", gain: 8, treble: 7, bass: 6, volume: 8, master: 7, stompbox: "Fuzz", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Spring", confidence: "high", notes: "Heavy fuzz, wide open tone. Wah optional for the solo." },
-  { song: "comfortably numb", artist: "pink floyd", preset: "Clean Twin", gain: 3, treble: 6, bass: 6, volume: 6, master: 5, stompbox: "Overdrive", modulation: "Chorus", delay: "Digital Delay", delay_time_ms: 500, fx: 4, reverb_type: "Hall", confidence: "high", notes: "Clean base with overdrive for solo. Heavy delay and reverb for space." },
-  { song: "another brick in the wall", artist: "pink floyd", preset: "Clean Twin", gain: 3, treble: 5, bass: 6, volume: 6, master: 5, stompbox: "None", modulation: "Chorus", delay: "Digital Delay", delay_time_ms: 440, fx: 4, reverb_type: "Hall", confidence: "high", notes: "Dark, spacious clean. Gilmour's famous delay-heavy tone." },
-  { song: "enter sandman", artist: "metallica", preset: "Metal 2000", gain: 9, treble: 7, bass: 8, volume: 7, master: 7, stompbox: "None", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Room", confidence: "high", notes: "Scooped mids are key to Metallica's tone. Tight low end." },
-  { song: "master of puppets", artist: "metallica", preset: "Metal 2000", gain: 9, treble: 7, bass: 8, volume: 7, master: 8, stompbox: "None", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Room", confidence: "high", notes: "Maximum gain, scooped mids. Downpick hard for that Hetfield chug." },
-  { song: "one", artist: "metallica", preset: "Metal 2000", gain: 8, treble: 6, bass: 7, volume: 6, master: 7, stompbox: "None", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Room", confidence: "high", notes: "Starts clean then gets heavy. Dial back gain for the intro." },
-  { song: "paranoid", artist: "black sabbath", preset: "Plexi Drive", gain: 7, treble: 5, bass: 8, volume: 7, master: 7, stompbox: "None", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Room", confidence: "high", notes: "Dark and heavy. More bass than you think. Iommi's detuned doom." },
-  { song: "iron man", artist: "black sabbath", preset: "Plexi Drive", gain: 7, treble: 5, bass: 8, volume: 7, master: 7, stompbox: "None", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Room", confidence: "high", notes: "Slow and heavy. Let each note ring — clarity matters more than gain." },
-  { song: "sunshine of your love", artist: "cream", preset: "Plexi Drive", gain: 7, treble: 6, bass: 6, volume: 7, master: 6, stompbox: "None", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Spring", confidence: "high", notes: "Creamy British crunch. Clapton's woman tone — roll off treble on guitar." },
-  { song: "layla", artist: "derek and the dominos", preset: "Plexi Drive", gain: 6, treble: 7, bass: 5, volume: 7, master: 6, stompbox: "None", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Spring", confidence: "high", notes: "Bright and biting. Duane Allman's slide meets Clapton's Strat tone." },
-  // BLUES
-  { song: "pride and joy", artist: "stevie ray vaughan", preset: "Texas Crunch", gain: 5, treble: 7, bass: 6, volume: 8, master: 7, stompbox: "None", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Spring", confidence: "high", notes: "Volume is key — SRV played loud. Spring reverb, cut the front pickup." },
-  { song: "texas flood", artist: "stevie ray vaughan", preset: "Texas Crunch", gain: 5, treble: 6, bass: 7, volume: 8, master: 7, stompbox: "Overdrive", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Spring", confidence: "high", notes: "Warm and singing. Overdrive pedal light for sustain, not distortion." },
-  { song: "the thrill is gone", artist: "bb king", preset: "Blues", gain: 4, treble: 5, bass: 6, volume: 6, master: 5, stompbox: "None", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Spring", confidence: "high", notes: "Lucille's tone — smooth and vocal. No effects, just amp and fingers." },
-  { song: "crossroads", artist: "cream", preset: "Texas Crunch", gain: 6, treble: 7, bass: 5, volume: 8, master: 7, stompbox: "None", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Spring", confidence: "high", notes: "Bright and aggressive. Clapton's live tone — pushing the amp hard." },
-  { song: "sweet home chicago", artist: "robert johnson", preset: "Blues", gain: 3, treble: 6, bass: 5, volume: 5, master: 5, stompbox: "None", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Spring", confidence: "medium", notes: "Vintage acoustic-electric vibe. Keep it clean and dynamic." },
-  // COUNTRY
-  { song: "friends in low places", artist: "garth brooks", preset: "Clean Twin", gain: 2, treble: 6, bass: 5, volume: 6, master: 5, stompbox: "None", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Hall", confidence: "medium", notes: "Crystal clean country tone. Let the natural dynamics shine." },
-  { song: "folsom prison blues", artist: "johnny cash", preset: "Tweed", gain: 3, treble: 5, bass: 6, volume: 6, master: 5, stompbox: "None", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Spring", confidence: "high", notes: "Vintage tweed warmth. Muffled, dark, and rhythmic." },
-  { song: "ring of fire", artist: "johnny cash", preset: "Tweed", gain: 3, treble: 5, bass: 6, volume: 6, master: 5, stompbox: "None", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Spring", confidence: "high", notes: "Warm and punchy. Mariachi-inspired picking attack." },
-  // POP / INDIE
-  { song: "with or without you", artist: "u2", preset: "Clean Twin", gain: 2, treble: 6, bass: 5, volume: 6, master: 5, stompbox: "None", modulation: "None", delay: "Digital Delay", delay_time_ms: 420, fx: 4, reverb_type: "Hall", confidence: "high", notes: "The Edge's signature ambient delay. Dotted eighth note delay is key." },
-  { song: "where the streets have no name", artist: "u2", preset: "Clean Twin", gain: 2, treble: 7, bass: 4, volume: 6, master: 5, stompbox: "None", modulation: "None", delay: "Digital Delay", delay_time_ms: 400, fx: 4, reverb_type: "Hall", confidence: "high", notes: "Bright and shimmering with heavy delay. The Edge's arena tone." },
-  { song: "losing my religion", artist: "rem", preset: "Champ", gain: 2, treble: 5, bass: 5, volume: 5, master: 5, stompbox: "None", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Spring", confidence: "high", notes: "Mandolin-inspired clean picking. Very light and articulate." },
-  { song: "mr jones", artist: "counting crows", preset: "Clean Twin", gain: 3, treble: 6, bass: 5, volume: 6, master: 5, stompbox: "None", modulation: "Chorus", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Hall", confidence: "medium", notes: "Jangly clean tone with slight chorus width." },
-  // ALTERNATIVE / GRUNGE
-  { song: "black hole sun", artist: "soundgarden", preset: "JCM", gain: 6, treble: 5, bass: 6, volume: 6, master: 6, stompbox: "None", modulation: "Chorus", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Hall", confidence: "high", notes: "Kim Thayil's lush chorus-heavy tone. Clean-ish with amp grit." },
-  { song: "black", artist: "pearl jam", preset: "JCM", gain: 5, treble: 6, bass: 6, volume: 6, master: 6, stompbox: "None", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Hall", confidence: "high", notes: "Warm and emotional. McCready's singing Strat tone." },
-  { song: "even flow", artist: "pearl jam", preset: "JCM", gain: 6, treble: 6, bass: 7, volume: 7, master: 7, stompbox: "None", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Room", confidence: "high", notes: "Heavy grunge crunch. Tight and aggressive rhythm tone." },
-  { song: "would", artist: "alice in chains", preset: "JCM", gain: 7, treble: 6, bass: 7, volume: 7, master: 7, stompbox: "None", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Room", confidence: "high", notes: "Dark and down-tuned. Jerry Cantrell's creamy crunch." },
-  { song: "rooster", artist: "alice in chains", preset: "JCM", gain: 7, treble: 5, bass: 8, volume: 7, master: 7, stompbox: "None", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Room", confidence: "high", notes: "Drop D heaviness. Bass up, mids scooped slightly." },
-  { song: "creep", artist: "radiohead", preset: "Clean Twin", gain: 3, treble: 6, bass: 5, volume: 6, master: 5, stompbox: "Distortion", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Hall", confidence: "high", notes: "Clean verses, hit the distortion for the heavy chorus drop." },
-  { song: "semi-charmed life", artist: "third eye blind", preset: "American Steel", gain: 5, treble: 7, bass: 5, volume: 7, master: 6, stompbox: "None", modulation: "Chorus", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Room", confidence: "medium", notes: "Bright and driving. High energy alternative rock tone." },
-  // PUNK
-  { song: "basket case", artist: "green day", preset: "JCM", gain: 7, treble: 7, bass: 6, volume: 7, master: 7, stompbox: "None", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Room", confidence: "high", notes: "Billie Joe's fat punk tone. Tight and punchy, almost no reverb." },
-  { song: "good riddance", artist: "green day", preset: "Clean Twin", gain: 2, treble: 6, bass: 5, volume: 5, master: 5, stompbox: "None", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Spring", confidence: "high", notes: "Acoustic-style clean fingerpicking. Warm and simple." },
-  { song: "american idiot", artist: "green day", preset: "American Steel", gain: 8, treble: 7, bass: 6, volume: 8, master: 7, stompbox: "None", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Room", confidence: "high", notes: "High-energy punk crunch. Tight and loud." },
-  { song: "blitzkrieg bop", artist: "ramones", preset: "Plexi Drive", gain: 6, treble: 7, bass: 5, volume: 8, master: 8, stompbox: "None", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Room", confidence: "high", notes: "Raw Marshall bark. No frills, just power chords and attitude." },
-  // CLASSIC COUNTRY / AMERICANA
-  { song: "take me home country roads", artist: "john denver", preset: "Champ", gain: 2, treble: 6, bass: 5, volume: 5, master: 5, stompbox: "None", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Spring", confidence: "medium", notes: "Clean and warm. Acoustic guitar feel on electric." },
-  // FUNK / R&B
-  { song: "superstition", artist: "stevie wonder", preset: "Clean Twin", gain: 2, treble: 6, bass: 6, volume: 7, master: 6, stompbox: "None", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Room", confidence: "medium", notes: "Funky and percussive. Clean with presence. Clavinet vibe on guitar." },
-  { song: "sir duke", artist: "stevie wonder", preset: "Clean Twin", gain: 2, treble: 7, bass: 5, volume: 7, master: 6, stompbox: "None", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Spring", confidence: "medium", notes: "Bright and joyful. Maximum clarity." },
-  // JAZZ
-  { song: "autumn leaves", artist: "jazz standard", preset: "Champ", gain: 1, treble: 4, bass: 7, volume: 5, master: 4, stompbox: "None", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Hall", confidence: "medium", notes: "Dark and warm jazz tone. Roll back the treble, let the bass sing." },
-  { song: "so what", artist: "miles davis", preset: "Champ", gain: 1, treble: 3, bass: 7, volume: 5, master: 4, stompbox: "None", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Hall", confidence: "medium", notes: "Modal jazz warmth. Very clean, very dark, very mellow." },
-  // MODERN ROCK
-  { song: "seven nation army", artist: "the white stripes", preset: "Tweed", gain: 5, treble: 5, bass: 8, volume: 7, master: 6, stompbox: "None", modulation: "None", delay: "Digital Delay", delay_time_ms: 800, fx: 4, reverb_type: "Room", confidence: "high", notes: "Massive bass-heavy riff through a Digitech Whammy into a tweed. Long delay for that octave effect." },
-  { song: "black betty", artist: "ram jam", preset: "Plexi Drive", gain: 7, treble: 7, bass: 6, volume: 7, master: 7, stompbox: "None", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Room", confidence: "medium", notes: "Raw and driving. Straight rock and roll attitude." },
-  { song: "hotel california", artist: "eagles", preset: "Clean Twin", gain: 3, treble: 6, bass: 5, volume: 6, master: 5, stompbox: "None", modulation: "Chorus", delay: "Analog Delay", delay_time_ms: 350, fx: 4, reverb_type: "Hall", confidence: "high", notes: "12-string shimmer tone. Chorus and delay for the iconic intro arpeggios." },
-  { song: "life in the fast lane", artist: "eagles", preset: "American Steel", gain: 6, treble: 7, bass: 6, volume: 7, master: 7, stompbox: "None", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Room", confidence: "high", notes: "Joe Walsh's gritty tone. American crunch, punchy and bright." },
+  {
+    song: "smells like teen spirit", artist: "nirvana",
+    rhythm: {
+      preset: "JCM", gain: 8, treble: 6, bass: 7, volume: 7, master: 6, fx: 4,
+      stompbox: { name: "None" },
+      modulation: { name: "None" },
+      delay: { name: "None" },
+      reverb: { type: "Room", decay: 3, tone: 5, level: 3 }
+    },
+    solo: {
+      preset: "JCM", gain: 9, treble: 7, bass: 6, volume: 8, master: 7, fx: 5,
+      stompbox: { name: "Overdrive", level: 7, gain: 4, tone: 6 },
+      modulation: { name: "None" },
+      delay: { name: "None" },
+      reverb: { type: "Room", decay: 4, tone: 5, level: 4 }
+    },
+    confidence: "high", notes: "Crank the gain for that grunge wall of sound. Solo boosts with light overdrive."
+  },
+  {
+    song: "come as you are", artist: "nirvana",
+    rhythm: {
+      preset: "JCM", gain: 6, treble: 5, bass: 6, volume: 6, master: 6, fx: 5,
+      stompbox: { name: "None" },
+      modulation: { name: "Chorus", rate: 3, depth: 5, level: 5 },
+      delay: { name: "None" },
+      reverb: { type: "Room", decay: 3, tone: 5, level: 3 }
+    },
+    solo: {
+      preset: "JCM", gain: 7, treble: 6, bass: 6, volume: 7, master: 6, fx: 5,
+      stompbox: { name: "None" },
+      modulation: { name: "Chorus", rate: 3, depth: 4, level: 4 },
+      delay: { name: "None" },
+      reverb: { type: "Room", decay: 4, tone: 5, level: 4 }
+    },
+    confidence: "high", notes: "Watery chorus is the signature. Keep gain moderate throughout."
+  },
+  {
+    song: "back in black", artist: "ac/dc",
+    rhythm: {
+      preset: "Plexi Drive", gain: 6, treble: 7, bass: 6, volume: 8, master: 7, fx: 3,
+      stompbox: { name: "None" },
+      modulation: { name: "None" },
+      delay: { name: "None" },
+      reverb: { type: "Spring", decay: 2, tone: 5, level: 2 }
+    },
+    solo: {
+      preset: "Plexi Drive", gain: 8, treble: 7, bass: 5, volume: 8, master: 8, fx: 4,
+      stompbox: { name: "Boost", level: 7, gain: 3, tone: 7 },
+      modulation: { name: "None" },
+      delay: { name: "None" },
+      reverb: { type: "Spring", decay: 2, tone: 5, level: 2 }
+    },
+    confidence: "high", notes: "Punchy British crunch. Boost for Angus solos, keep it bright."
+  },
+  {
+    song: "highway to hell", artist: "ac/dc",
+    rhythm: {
+      preset: "Plexi Drive", gain: 6, treble: 7, bass: 6, volume: 8, master: 7, fx: 3,
+      stompbox: { name: "None" },
+      modulation: { name: "None" },
+      delay: { name: "None" },
+      reverb: { type: "Spring", decay: 2, tone: 5, level: 2 }
+    },
+    solo: {
+      preset: "Plexi Drive", gain: 8, treble: 8, bass: 5, volume: 8, master: 8, fx: 4,
+      stompbox: { name: "Boost", level: 8, gain: 3, tone: 7 },
+      modulation: { name: "None" },
+      delay: { name: "None" },
+      reverb: { type: "Spring", decay: 2, tone: 6, level: 2 }
+    },
+    confidence: "high", notes: "Classic Angus tone. Bright and raw — no frills needed."
+  },
+  {
+    song: "whole lotta love", artist: "led zeppelin",
+    rhythm: {
+      preset: "Plexi Drive", gain: 7, treble: 6, bass: 7, volume: 7, master: 7, fx: 4,
+      stompbox: { name: "None" },
+      modulation: { name: "None" },
+      delay: { name: "None" },
+      reverb: { type: "Room", decay: 3, tone: 5, level: 3 }
+    },
+    solo: {
+      preset: "Plexi Drive", gain: 8, treble: 7, bass: 6, volume: 8, master: 7, fx: 5,
+      stompbox: { name: "None" },
+      modulation: { name: "None" },
+      delay: { name: "Tape Delay", time_ms: 280, feedback: 3, level: 4 },
+      reverb: { type: "Room", decay: 4, tone: 5, level: 4 }
+    },
+    confidence: "high", notes: "Fat and aggressive. Page adds tape delay on solos for depth."
+  },
+  {
+    song: "stairway to heaven", artist: "led zeppelin",
+    rhythm: {
+      preset: "Boutique", gain: 4, treble: 6, bass: 5, volume: 6, master: 5, fx: 5,
+      stompbox: { name: "None" },
+      modulation: { name: "None" },
+      delay: { name: "Analog Delay", time_ms: 350, feedback: 3, level: 4 },
+      reverb: { type: "Hall", decay: 5, tone: 5, level: 5 }
+    },
+    solo: {
+      preset: "Plexi Drive", gain: 7, treble: 7, bass: 6, volume: 8, master: 7, fx: 5,
+      stompbox: { name: "Overdrive", level: 6, gain: 5, tone: 6 },
+      modulation: { name: "None" },
+      delay: { name: "Analog Delay", time_ms: 380, feedback: 4, level: 5 },
+      reverb: { type: "Hall", decay: 5, tone: 5, level: 5 }
+    },
+    confidence: "high", notes: "Clean fingerpicking to start, then blast into the solo. Completely different sounds."
+  },
+  {
+    song: "sweet child o mine", artist: "guns n roses",
+    rhythm: {
+      preset: "JCM", gain: 7, treble: 6, bass: 6, volume: 7, master: 7, fx: 5,
+      stompbox: { name: "None" },
+      modulation: { name: "Chorus", rate: 2, depth: 4, level: 4 },
+      delay: { name: "None" },
+      reverb: { type: "Room", decay: 3, tone: 5, level: 3 }
+    },
+    solo: {
+      preset: "JCM", gain: 8, treble: 7, bass: 6, volume: 8, master: 8, fx: 5,
+      stompbox: { name: "Overdrive", level: 7, gain: 5, tone: 6 },
+      modulation: { name: "None" },
+      delay: { name: "None" },
+      reverb: { type: "Room", decay: 4, tone: 5, level: 4 }
+    },
+    confidence: "high", notes: "Slash's JCM800 tone. Chorus on rhythm for width, raw for the solo."
+  },
+  {
+    song: "purple haze", artist: "jimi hendrix",
+    rhythm: {
+      preset: "Plexi Drive", gain: 7, treble: 7, bass: 5, volume: 7, master: 7, fx: 5,
+      stompbox: { name: "Fuzz", level: 8, sustain: 7, tone: 6 },
+      modulation: { name: "None" },
+      delay: { name: "None" },
+      reverb: { type: "Spring", decay: 4, tone: 5, level: 4 }
+    },
+    solo: {
+      preset: "Plexi Drive", gain: 8, treble: 7, bass: 5, volume: 8, master: 8, fx: 6,
+      stompbox: { name: "Fuzz", level: 9, sustain: 8, tone: 6 },
+      modulation: { name: "None" },
+      delay: { name: "None" },
+      reverb: { type: "Spring", decay: 4, tone: 5, level: 4 }
+    },
+    confidence: "high", notes: "Fuzz Face into Marshall. Crank the fuzz for the solo — let it rip."
+  },
+  {
+    song: "comfortably numb", artist: "pink floyd",
+    rhythm: {
+      preset: "Clean Twin", gain: 3, treble: 6, bass: 6, volume: 6, master: 5, fx: 6,
+      stompbox: { name: "None" },
+      modulation: { name: "Chorus", rate: 2, depth: 4, level: 5 },
+      delay: { name: "Digital Delay", time_ms: 500, feedback: 5, level: 5 },
+      reverb: { type: "Hall", decay: 7, tone: 5, level: 6 }
+    },
+    solo: {
+      preset: "Boutique", gain: 5, treble: 6, bass: 6, volume: 7, master: 6, fx: 7,
+      stompbox: { name: "Overdrive", level: 6, gain: 4, tone: 5 },
+      modulation: { name: "Chorus", rate: 2, depth: 5, level: 5 },
+      delay: { name: "Digital Delay", time_ms: 500, feedback: 6, level: 6 },
+      reverb: { type: "Hall", decay: 8, tone: 5, level: 7 }
+    },
+    confidence: "high", notes: "Gilmour's singing sustain. Space and delay are everything. Solo needs more drive and reverb."
+  },
+  {
+    song: "enter sandman", artist: "metallica",
+    rhythm: {
+      preset: "Metal 2000", gain: 9, treble: 7, bass: 8, volume: 7, master: 7, fx: 3,
+      stompbox: { name: "None" },
+      modulation: { name: "None" },
+      delay: { name: "None" },
+      reverb: { type: "Room", decay: 2, tone: 5, level: 2 }
+    },
+    solo: {
+      preset: "Metal 2000", gain: 9, treble: 7, bass: 7, volume: 8, master: 8, fx: 4,
+      stompbox: { name: "Overdrive", level: 6, gain: 3, tone: 6 },
+      modulation: { name: "None" },
+      delay: { name: "Digital Delay", time_ms: 300, feedback: 3, level: 4 },
+      reverb: { type: "Room", decay: 3, tone: 5, level: 3 }
+    },
+    confidence: "high", notes: "Scooped mids, maximum palm muting. Tight and crushing."
+  },
+  {
+    song: "master of puppets", artist: "metallica",
+    rhythm: {
+      preset: "Metal 2000", gain: 9, treble: 7, bass: 8, volume: 7, master: 8, fx: 3,
+      stompbox: { name: "None" },
+      modulation: { name: "None" },
+      delay: { name: "None" },
+      reverb: { type: "Room", decay: 1, tone: 5, level: 2 }
+    },
+    solo: {
+      preset: "Metal 2000", gain: 9, treble: 8, bass: 6, volume: 8, master: 8, fx: 5,
+      stompbox: { name: "Overdrive", level: 7, gain: 4, tone: 7 },
+      modulation: { name: "None" },
+      delay: { name: "Digital Delay", time_ms: 250, feedback: 3, level: 4 },
+      reverb: { type: "Room", decay: 3, tone: 6, level: 3 }
+    },
+    confidence: "high", notes: "Downpick hard for rhythm. Kirk's solos need more treble and a touch of delay."
+  },
+  {
+    song: "pride and joy", artist: "stevie ray vaughan",
+    rhythm: {
+      preset: "Texas Crunch", gain: 5, treble: 7, bass: 6, volume: 8, master: 7, fx: 4,
+      stompbox: { name: "None" },
+      modulation: { name: "None" },
+      delay: { name: "None" },
+      reverb: { type: "Spring", decay: 4, tone: 6, level: 4 }
+    },
+    solo: {
+      preset: "Texas Crunch", gain: 6, treble: 7, bass: 6, volume: 9, master: 8, fx: 5,
+      stompbox: { name: "Overdrive", level: 7, gain: 3, tone: 7 },
+      modulation: { name: "None" },
+      delay: { name: "None" },
+      reverb: { type: "Spring", decay: 5, tone: 6, level: 5 }
+    },
+    confidence: "high", notes: "SRV played LOUD. Volume is your friend. Slight overdrive for solo sustain."
+  },
+  {
+    song: "the thrill is gone", artist: "bb king",
+    rhythm: {
+      preset: "Blues", gain: 4, treble: 5, bass: 6, volume: 6, master: 5, fx: 4,
+      stompbox: { name: "None" },
+      modulation: { name: "None" },
+      delay: { name: "None" },
+      reverb: { type: "Spring", decay: 5, tone: 4, level: 5 }
+    },
+    solo: {
+      preset: "Blues", gain: 5, treble: 5, bass: 6, volume: 7, master: 6, fx: 4,
+      stompbox: { name: "None" },
+      modulation: { name: "None" },
+      delay: { name: "None" },
+      reverb: { type: "Spring", decay: 6, tone: 4, level: 5 }
+    },
+    confidence: "high", notes: "Lucille's tone — smooth, vocal, no effects. Just amp and fingers."
+  },
+  {
+    song: "with or without you", artist: "u2",
+    rhythm: {
+      preset: "Clean Twin", gain: 2, treble: 6, bass: 5, volume: 6, master: 5, fx: 7,
+      stompbox: { name: "None" },
+      modulation: { name: "None" },
+      delay: { name: "Digital Delay", time_ms: 420, feedback: 5, level: 6 },
+      reverb: { type: "Hall", decay: 7, tone: 5, level: 7 }
+    },
+    solo: {
+      preset: "Clean Twin", gain: 2, treble: 6, bass: 5, volume: 7, master: 5, fx: 8,
+      stompbox: { name: "None" },
+      modulation: { name: "None" },
+      delay: { name: "Digital Delay", time_ms: 420, feedback: 6, level: 7 },
+      reverb: { type: "Hall", decay: 8, tone: 5, level: 8 }
+    },
+    confidence: "high", notes: "The Edge's dotted 8th delay is the whole song. Push feedback and level for the swell."
+  },
+  {
+    song: "hotel california", artist: "eagles",
+    rhythm: {
+      preset: "Clean Twin", gain: 3, treble: 6, bass: 5, volume: 6, master: 5, fx: 6,
+      stompbox: { name: "None" },
+      modulation: { name: "Chorus", rate: 2, depth: 4, level: 5 },
+      delay: { name: "Analog Delay", time_ms: 350, feedback: 3, level: 4 },
+      reverb: { type: "Hall", decay: 6, tone: 5, level: 5 }
+    },
+    solo: {
+      preset: "Clean Twin", gain: 4, treble: 7, bass: 5, volume: 7, master: 6, fx: 6,
+      stompbox: { name: "Overdrive", level: 5, gain: 4, tone: 6 },
+      modulation: { name: "Chorus", rate: 2, depth: 3, level: 4 },
+      delay: { name: "Analog Delay", time_ms: 380, feedback: 4, level: 5 },
+      reverb: { type: "Hall", decay: 6, tone: 5, level: 5 }
+    },
+    confidence: "high", notes: "Ambient 12-string shimmer. Two-guitar harmony solo — dial up the overdrive slightly."
+  },
+  {
+    song: "seven nation army", artist: "the white stripes",
+    rhythm: {
+      preset: "Tweed", gain: 5, treble: 5, bass: 8, volume: 7, master: 6, fx: 5,
+      stompbox: { name: "None" },
+      modulation: { name: "None" },
+      delay: { name: "Digital Delay", time_ms: 800, feedback: 4, level: 6 },
+      reverb: { type: "Room", decay: 3, tone: 4, level: 3 }
+    },
+    solo: {
+      preset: "Tweed", gain: 6, treble: 6, bass: 7, volume: 8, master: 7, fx: 5,
+      stompbox: { name: "Overdrive", level: 7, gain: 5, tone: 5 },
+      modulation: { name: "None" },
+      delay: { name: "Digital Delay", time_ms: 800, feedback: 4, level: 5 },
+      reverb: { type: "Room", decay: 3, tone: 4, level: 3 }
+    },
+    confidence: "high", notes: "The long delay creates the octave-drop illusion. Bass-heavy for maximum stomp."
+  },
+  {
+    song: "basket case", artist: "green day",
+    rhythm: {
+      preset: "JCM", gain: 7, treble: 7, bass: 6, volume: 7, master: 7, fx: 3,
+      stompbox: { name: "None" },
+      modulation: { name: "None" },
+      delay: { name: "None" },
+      reverb: { type: "Room", decay: 2, tone: 5, level: 2 }
+    },
+    solo: {
+      preset: "JCM", gain: 8, treble: 7, bass: 6, volume: 8, master: 7, fx: 4,
+      stompbox: { name: "Overdrive", level: 6, gain: 4, tone: 6 },
+      modulation: { name: "None" },
+      delay: { name: "None" },
+      reverb: { type: "Room", decay: 2, tone: 5, level: 2 }
+    },
+    confidence: "high", notes: "Billie Joe's fat punk tone. Tight, punchy, minimal reverb."
+  },
+  {
+    song: "good riddance", artist: "green day",
+    rhythm: {
+      preset: "Clean Twin", gain: 2, treble: 6, bass: 5, volume: 5, master: 5, fx: 3,
+      stompbox: { name: "None" },
+      modulation: { name: "None" },
+      delay: { name: "None" },
+      reverb: { type: "Spring", decay: 3, tone: 5, level: 3 }
+    },
+    solo: {
+      preset: "Clean Twin", gain: 2, treble: 6, bass: 5, volume: 5, master: 5, fx: 3,
+      stompbox: { name: "None" },
+      modulation: { name: "None" },
+      delay: { name: "None" },
+      reverb: { type: "Spring", decay: 3, tone: 5, level: 3 }
+    },
+    confidence: "high", notes: "Acoustic fingerpicking feel throughout. No difference rhythm vs solo — keep it clean."
+  },
+  {
+    song: "black hole sun", artist: "soundgarden",
+    rhythm: {
+      preset: "JCM", gain: 6, treble: 5, bass: 6, volume: 6, master: 6, fx: 6,
+      stompbox: { name: "None" },
+      modulation: { name: "Chorus", rate: 2, depth: 6, level: 6 },
+      delay: { name: "None" },
+      reverb: { type: "Hall", decay: 6, tone: 4, level: 6 }
+    },
+    solo: {
+      preset: "JCM", gain: 7, treble: 6, bass: 6, volume: 7, master: 7, fx: 6,
+      stompbox: { name: "Overdrive", level: 6, gain: 4, tone: 5 },
+      modulation: { name: "Chorus", rate: 2, depth: 5, level: 5 },
+      delay: { name: "None" },
+      reverb: { type: "Hall", decay: 6, tone: 4, level: 6 }
+    },
+    confidence: "high", notes: "Kim Thayil's lush chorus-drenched tone. Dark and dreamy."
+  },
+  {
+    song: "creep", artist: "radiohead",
+    rhythm: {
+      preset: "Clean Twin", gain: 3, treble: 6, bass: 5, volume: 6, master: 5, fx: 5,
+      stompbox: { name: "None" },
+      modulation: { name: "None" },
+      delay: { name: "None" },
+      reverb: { type: "Hall", decay: 5, tone: 5, level: 5 }
+    },
+    solo: {
+      preset: "Clean Twin", gain: 3, treble: 6, bass: 5, volume: 6, master: 5, fx: 5,
+      stompbox: { name: "Distortion", level: 8, gain: 7, tone: 5 },
+      modulation: { name: "None" },
+      delay: { name: "None" },
+      reverb: { type: "Hall", decay: 5, tone: 5, level: 5 }
+    },
+    confidence: "high", notes: "Clean verses then SLAM the distortion for the heavy chorus drop. That's the whole trick."
+  },
+  {
+    song: "folsom prison blues", artist: "johnny cash",
+    rhythm: {
+      preset: "Tweed", gain: 3, treble: 5, bass: 6, volume: 6, master: 5, fx: 3,
+      stompbox: { name: "None" },
+      modulation: { name: "None" },
+      delay: { name: "None" },
+      reverb: { type: "Spring", decay: 3, tone: 4, level: 3 }
+    },
+    solo: {
+      preset: "Tweed", gain: 4, treble: 6, bass: 6, volume: 7, master: 5, fx: 3,
+      stompbox: { name: "None" },
+      modulation: { name: "None" },
+      delay: { name: "None" },
+      reverb: { type: "Spring", decay: 3, tone: 4, level: 3 }
+    },
+    confidence: "high", notes: "Vintage tweed warmth. Dark and rhythmic — the train is the whole feel."
+  },
 ];
 
-// Genre-based presets for unknown songs
 const GENRE_PRESETS = {
-  metal:     { preset: "Metal 2000", gain: 9, treble: 7, bass: 8, volume: 7, master: 7, stompbox: "None", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Room", confidence: "low", notes: "Generic metal tone — high gain, scooped mids, tight low end." },
-  rock:      { preset: "JCM", gain: 6, treble: 6, bass: 6, volume: 7, master: 6, stompbox: "None", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Room", confidence: "low", notes: "Classic rock crunch — adjust gain to taste." },
-  blues:     { preset: "Texas Crunch", gain: 5, treble: 6, bass: 6, volume: 7, master: 6, stompbox: "None", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Spring", confidence: "low", notes: "Blues foundation — warm mids, spring reverb, let the dynamics breathe." },
-  country:   { preset: "Clean Twin", gain: 2, treble: 7, bass: 5, volume: 6, master: 5, stompbox: "None", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Spring", confidence: "low", notes: "Twangy clean country tone — bright and snappy." },
-  jazz:      { preset: "Champ", gain: 1, treble: 3, bass: 7, volume: 5, master: 4, stompbox: "None", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Hall", confidence: "low", notes: "Dark and warm jazz tone — roll the treble back, stay clean." },
-  punk:      { preset: "American Steel", gain: 8, treble: 7, bass: 6, volume: 8, master: 7, stompbox: "None", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Room", confidence: "low", notes: "Fast and loud punk tone — no frills, just crunch." },
-  pop:       { preset: "Clean Twin", gain: 3, treble: 6, bass: 5, volume: 6, master: 5, stompbox: "None", modulation: "Chorus", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Hall", confidence: "low", notes: "Clean pop tone with chorus shimmer." },
-  default:   { preset: "Clean Twin", gain: 5, treble: 6, bass: 6, volume: 6, master: 5, stompbox: "None", modulation: "None", delay: "None", delay_time_ms: null, fx: 4, reverb_type: "Spring", confidence: "low", notes: "Starting point — dial it in from here based on the song's genre." }
+  metal: {
+    rhythm: { preset: "Metal 2000", gain: 9, treble: 7, bass: 8, volume: 7, master: 7, fx: 3, stompbox: { name: "None" }, modulation: { name: "None" }, delay: { name: "None" }, reverb: { type: "Room", decay: 2, tone: 5, level: 2 } },
+    solo:   { preset: "Metal 2000", gain: 9, treble: 8, bass: 7, volume: 8, master: 8, fx: 5, stompbox: { name: "Overdrive", level: 7, gain: 4, tone: 7 }, modulation: { name: "None" }, delay: { name: "Digital Delay", time_ms: 280, feedback: 3, level: 4 }, reverb: { type: "Room", decay: 3, tone: 5, level: 3 } }
+  },
+  rock: {
+    rhythm: { preset: "JCM", gain: 6, treble: 6, bass: 6, volume: 7, master: 6, fx: 4, stompbox: { name: "None" }, modulation: { name: "None" }, delay: { name: "None" }, reverb: { type: "Room", decay: 3, tone: 5, level: 3 } },
+    solo:   { preset: "JCM", gain: 7, treble: 7, bass: 6, volume: 8, master: 7, fx: 5, stompbox: { name: "Overdrive", level: 7, gain: 4, tone: 6 }, modulation: { name: "None" }, delay: { name: "Analog Delay", time_ms: 300, feedback: 3, level: 4 }, reverb: { type: "Room", decay: 4, tone: 5, level: 4 } }
+  },
+  blues: {
+    rhythm: { preset: "Texas Crunch", gain: 5, treble: 6, bass: 6, volume: 7, master: 6, fx: 4, stompbox: { name: "None" }, modulation: { name: "None" }, delay: { name: "None" }, reverb: { type: "Spring", decay: 4, tone: 5, level: 4 } },
+    solo:   { preset: "Texas Crunch", gain: 6, treble: 7, bass: 5, volume: 8, master: 7, fx: 5, stompbox: { name: "Overdrive", level: 6, gain: 3, tone: 7 }, modulation: { name: "None" }, delay: { name: "None" }, reverb: { type: "Spring", decay: 5, tone: 5, level: 5 } }
+  },
+  country: {
+    rhythm: { preset: "Clean Twin", gain: 2, treble: 7, bass: 5, volume: 6, master: 5, fx: 3, stompbox: { name: "None" }, modulation: { name: "None" }, delay: { name: "None" }, reverb: { type: "Spring", decay: 3, tone: 6, level: 4 } },
+    solo:   { preset: "Clean Twin", gain: 3, treble: 7, bass: 5, volume: 7, master: 5, fx: 4, stompbox: { name: "Boost", level: 7, gain: 3, tone: 7 }, modulation: { name: "None" }, delay: { name: "Analog Delay", time_ms: 280, feedback: 3, level: 4 }, reverb: { type: "Spring", decay: 4, tone: 6, level: 4 } }
+  },
+  jazz: {
+    rhythm: { preset: "Champ", gain: 1, treble: 3, bass: 7, volume: 5, master: 4, fx: 3, stompbox: { name: "None" }, modulation: { name: "None" }, delay: { name: "None" }, reverb: { type: "Hall", decay: 4, tone: 3, level: 4 } },
+    solo:   { preset: "Champ", gain: 2, treble: 4, bass: 7, volume: 6, master: 5, fx: 4, stompbox: { name: "None" }, modulation: { name: "None" }, delay: { name: "None" }, reverb: { type: "Hall", decay: 5, tone: 3, level: 5 } }
+  },
+  punk: {
+    rhythm: { preset: "American Steel", gain: 8, treble: 7, bass: 6, volume: 8, master: 7, fx: 2, stompbox: { name: "None" }, modulation: { name: "None" }, delay: { name: "None" }, reverb: { type: "Room", decay: 2, tone: 5, level: 2 } },
+    solo:   { preset: "American Steel", gain: 8, treble: 7, bass: 6, volume: 8, master: 8, fx: 3, stompbox: { name: "Overdrive", level: 7, gain: 4, tone: 6 }, modulation: { name: "None" }, delay: { name: "None" }, reverb: { type: "Room", decay: 2, tone: 5, level: 2 } }
+  },
+  pop: {
+    rhythm: { preset: "Clean Twin", gain: 3, treble: 6, bass: 5, volume: 6, master: 5, fx: 5, stompbox: { name: "None" }, modulation: { name: "Chorus", rate: 3, depth: 4, level: 5 }, delay: { name: "None" }, reverb: { type: "Hall", decay: 4, tone: 5, level: 5 } },
+    solo:   { preset: "Clean Twin", gain: 4, treble: 7, bass: 5, volume: 7, master: 5, fx: 5, stompbox: { name: "Overdrive", level: 6, gain: 4, tone: 6 }, modulation: { name: "Chorus", rate: 3, depth: 3, level: 4 }, delay: { name: "None" }, reverb: { type: "Hall", decay: 4, tone: 5, level: 5 } }
+  },
+  default: {
+    rhythm: { preset: "Clean Twin", gain: 5, treble: 6, bass: 6, volume: 6, master: 5, fx: 4, stompbox: { name: "None" }, modulation: { name: "None" }, delay: { name: "None" }, reverb: { type: "Spring", decay: 3, tone: 5, level: 3 } },
+    solo:   { preset: "Clean Twin", gain: 6, treble: 6, bass: 6, volume: 7, master: 6, fx: 5, stompbox: { name: "Overdrive", level: 6, gain: 4, tone: 6 }, modulation: { name: "None" }, delay: { name: "Analog Delay", time_ms: 300, feedback: 3, level: 4 }, reverb: { type: "Spring", decay: 4, tone: 5, level: 4 } }
+  }
 };
 
 function normalize(str) {
@@ -103,7 +444,6 @@ function findBestMatch(song, artist) {
     }
   }
 
-  // Require at least some song title match
   return bestScore >= 0.4 ? { match: bestMatch, score: bestScore } : null;
 }
 
@@ -114,7 +454,7 @@ function guessGenre(artist) {
   if (/green day|ramones|clash|sex pistols|blink|sum 41|offspring/.test(a)) return "punk";
   if (/bb king|muddy waters|vaughan|clapton|buddy guy|albert king/.test(a)) return "blues";
   if (/cash|brooks|strait|urban|chesney|williams|hank/.test(a)) return "country";
-  if (/coltrane|miles davis|parker|monk|wes montgomery|pat metheny/.test(a)) return "jazz";
+  if (/coltrane|miles davis|parker|monk|wes montgomery/.test(a)) return "jazz";
   if (/taylor swift|beyonce|rihanna|katy perry|ariana|justin/.test(a)) return "pop";
   return "default";
 }
@@ -130,20 +470,26 @@ export async function handler(event) {
   }
 
   const result = findBestMatch(song, artist);
-  let settings;
+  let rhythm, solo, confidence, notes;
 
   if (result) {
-    settings = { ...result.match, song, artist: artist || result.match.artist };
-    if (result.score >= 0.7) settings.confidence = "high";
-    else if (result.score >= 0.4) settings.confidence = "medium";
+    const m = result.match;
+    rhythm = m.rhythm;
+    solo = m.solo;
+    notes = m.notes;
+    confidence = result.score >= 0.7 ? "high" : "medium";
   } else {
     const genre = guessGenre(artist);
-    settings = { ...GENRE_PRESETS[genre], song, artist: artist || "Unknown" };
+    const preset = GENRE_PRESETS[genre];
+    rhythm = preset.rhythm;
+    solo = preset.solo;
+    notes = "Genre-based estimate — dial in from here.";
+    confidence = "low";
   }
 
   return {
     statusCode: 200,
     headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
-    body: JSON.stringify(settings)
+    body: JSON.stringify({ song, artist: artist || "Unknown", confidence, notes, rhythm, solo })
   };
 }

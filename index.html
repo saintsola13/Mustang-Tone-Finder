@@ -425,6 +425,43 @@
     color: var(--fender-red);
   }
 
+  .effect-params {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: #4a5568;
+    margin-top: 4px;
+    line-height: 1.5;
+    letter-spacing: 0.5px;
+  }
+  .effect-slot.active .effect-params { color: #9ca3af; }
+
+  /* Mode toggle */
+  .mode-toggle {
+    display: flex;
+    gap: 0;
+    background: #13151a;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .mode-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 10px 0;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 15px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .mode-btn.active {
+    background: var(--fender-red);
+    color: white;
+  }
+
   .effect-dot {
     width: 6px;
     height: 6px;
@@ -593,6 +630,10 @@
     </div>
 
     <div class="knobs-section">
+      <div class="mode-toggle">
+        <button class="mode-btn active" id="btnRhythm" onclick="setMode('rhythm')">RHYTHM</button>
+        <button class="mode-btn" id="btnSolo" onclick="setMode('solo')">SOLO</button>
+      </div>
       <div class="section-label">// Tone Controls</div>
       <div class="knobs-grid">
         <div class="knob-wrapper">
@@ -668,22 +709,22 @@
         <div class="effect-slot" id="fx-stomp">
           <span class="effect-type">Stompbox</span>
           <span class="effect-name" id="fx-stomp-name">None</span>
-          <span class="effect-dot"></span>
+          <span class="effect-params" id="fx-stomp-params"></span>
         </div>
         <div class="effect-slot" id="fx-mod">
           <span class="effect-type">Modulation</span>
           <span class="effect-name" id="fx-mod-name">None</span>
-          <span class="effect-dot"></span>
+          <span class="effect-params" id="fx-mod-params"></span>
         </div>
         <div class="effect-slot" id="fx-delay">
           <span class="effect-type">Delay</span>
           <span class="effect-name" id="fx-delay-name">None</span>
-          <span class="effect-dot"></span>
+          <span class="effect-params" id="fx-delay-params"></span>
         </div>
         <div class="effect-slot" id="fx-rev">
           <span class="effect-type">Reverb Type</span>
           <span class="effect-name" id="fx-rev-name">None</span>
-          <span class="effect-dot"></span>
+          <span class="effect-params" id="fx-rev-params"></span>
         </div>
       </div>
     </div>
@@ -718,42 +759,83 @@
     val.textContent = value;
   }
 
-  function setEffect(slotId, nameId, value) {
+  let currentData = null;
+  let currentMode = 'rhythm';
+
+  function fxParams(obj) {
+    if (!obj || obj.name === 'None' || !obj.name) return '';
+    const parts = [];
+    if (obj.level != null)    parts.push('Level: ' + obj.level);
+    if (obj.gain != null)     parts.push('Gain: ' + obj.gain);
+    if (obj.tone != null)     parts.push('Tone: ' + obj.tone);
+    if (obj.sustain != null)  parts.push('Sustain: ' + obj.sustain);
+    if (obj.rate != null)     parts.push('Rate: ' + obj.rate);
+    if (obj.depth != null)    parts.push('Depth: ' + obj.depth);
+    if (obj.time_ms != null)  parts.push('Time: ' + obj.time_ms + 'ms');
+    if (obj.feedback != null) parts.push('Feedback: ' + obj.feedback);
+    if (obj.decay != null)    parts.push('Decay: ' + obj.decay);
+    if (obj.type != null)     parts.push('Type: ' + obj.type);
+    return parts.join(' · ');
+  }
+
+  function setEffect(slotId, nameId, paramsId, obj) {
     const slot = document.getElementById(slotId);
     const name = document.getElementById(nameId);
-    const isActive = value && value.toLowerCase() !== 'none' && value !== '0';
-    name.textContent = isActive ? value : 'None';
+    const params = document.getElementById(paramsId);
+    const isActive = obj && obj.name && obj.name !== 'None';
+    name.textContent = isActive ? obj.name : 'None';
+    if (params) params.textContent = isActive ? fxParams(obj) : '';
     slot.classList.toggle('active', isActive);
   }
 
+  function applyMode(mode) {
+    if (!currentData) return;
+    const d = currentData[mode];
+    if (!d) return;
+
+    document.getElementById('presetValue').textContent = d.preset || '—';
+    document.getElementById('btnRhythm').classList.toggle('active', mode === 'rhythm');
+    document.getElementById('btnSolo').classList.toggle('active', mode === 'solo');
+
+    setTimeout(() => {
+      setKnob('gain',   d.gain   ?? 5);
+      setKnob('treble', d.treble ?? 5);
+      setKnob('bass',   d.bass   ?? 6);
+      setKnob('volume', d.volume ?? 6);
+      setKnob('master', d.master ?? 5);
+      setKnob('fx',     d.fx     ?? 4);
+    }, 50);
+
+    setEffect('fx-stomp', 'fx-stomp-name', 'fx-stomp-params', d.stompbox);
+    setEffect('fx-mod',   'fx-mod-name',   'fx-mod-params',   d.modulation);
+    setEffect('fx-delay', 'fx-delay-name', 'fx-delay-params', d.delay);
+    setEffect('fx-rev',   'fx-rev-name',   'fx-rev-params',   d.reverb);
+  }
+
+  function setMode(mode) {
+    currentMode = mode;
+    applyMode(mode);
+  }
+
   function renderSettings(data) {
+    currentData = data;
+    currentMode = 'rhythm';
+
     document.getElementById('resultSong').textContent = data.song || 'Unknown Song';
     document.getElementById('resultArtist').textContent = data.artist || '';
-    document.getElementById('presetValue').textContent = data.preset || '—';
 
     const badge = document.getElementById('confidenceBadge');
     badge.textContent = (data.confidence || 'medium').toUpperCase() + ' CONFIDENCE';
     badge.className = 'confidence-badge confidence-' + (data.confidence || 'medium');
 
-    // Animate knobs after a tick
-    setTimeout(() => {
-      setKnob('gain', data.gain ?? 5);
-      setKnob('treble', data.treble ?? 5);
-      setKnob('bass', data.bass ?? 5);
-      setKnob('volume', data.volume ?? 6);
-      setKnob('master', data.master ?? 5);
-      setKnob('fx', data.fx ?? 4);
-    }, 100);
-
-    setEffect('fx-stomp', 'fx-stomp-name', data.stompbox);
-    setEffect('fx-mod', 'fx-mod-name', data.modulation);
-    setEffect('fx-delay', 'fx-delay-name', data.delay && data.delay !== 'None' ? 
-      `${data.delay}${data.delay_time_ms ? ' · ' + data.delay_time_ms + 'ms' : ''}` : null);
-    setEffect('fx-rev', 'fx-rev-name', data.reverb_type);
-
     document.getElementById('toneNotes').textContent = data.notes || '—';
-
     document.getElementById('ampPanel').classList.add('visible');
+
+    // Reset toggle to Rhythm
+    document.getElementById('btnRhythm').classList.add('active');
+    document.getElementById('btnSolo').classList.remove('active');
+
+    applyMode('rhythm');
   }
 
   async function getSettings() {
