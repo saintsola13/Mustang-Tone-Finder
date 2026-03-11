@@ -1,0 +1,7 @@
+{
+  "name": "mustang-tone-finder",
+  "version": "1.0.0",
+  "description": "Fender Mustang LT 25 tone settings for any song",
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0"  }
+}

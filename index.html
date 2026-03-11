@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mustang LT 25 Tone Finder</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0a0a0a;
+    --dark: #111214;
+    --panel: #1a1c1f;
+    --border: #2a2d32;
+    --fender-red: #c8102e;
+    --fender-cream: #f5f0e8;
+    --knob-bg: #222428;
+    --knob-ring: #3a3d42;
+    --glow: #ff3d5a;
+    --text: #e8e4dc;
+    --muted: #6b7280;
+    --green: #22c55e;
+    --amber: #f59e0b;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--black);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Scanline texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.08) 2px,
+      rgba(0,0,0,0.08) 4px
+    );
+    pointer-events: none;
+    z-index: 100;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 40px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, #151719 0%, var(--black) 100%);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .logo-mark {
+    width: 42px;
+    height: 42px;
+    background: var(--fender-red);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    color: white;
+    letter-spacing: 1px;
+    box-shadow: 0 0 20px rgba(200,16,46,0.4);
+  }
+
+  .logo-text {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 3px;
+    color: var(--fender-cream);
+    line-height: 1;
+  }
+
+  .logo-sub {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 300;
+  }
+
+  .header-badge {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--fender-red);
+    border: 1px solid var(--fender-red);
+    padding: 4px 10px;
+    border-radius: 2px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 50px 20px 80px;
+  }
+
+  .search-section {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+
+  .search-headline {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(36px, 6vw, 64px);
+    letter-spacing: 4px;
+    color: var(--fender-cream);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .search-headline span {
+    color: var(--fender-red);
+  }
+
+  .search-sub {
+    color: var(--muted);
+    font-size: 14px;
+    letter-spacing: 1px;
+    margin-bottom: 36px;
+  }
+
+  .search-box {
+    display: flex;
+    gap: 0;
+    max-width: 580px;
+    margin: 0 auto;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .search-box:focus-within {
+    border-color: var(--fender-red);
+    box-shadow: 0 0 0 1px var(--fender-red), 0 0 30px rgba(200,16,46,0.15);
+  }
+
+  .search-inputs {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .search-inputs input {
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 12px 18px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    width: 100%;
+  }
+
+  .search-inputs input::placeholder {
+    color: var(--muted);
+  }
+
+  .search-inputs input:first-child {
+    border-bottom: 1px solid var(--border);
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  .search-btn {
+    background: var(--fender-red);
+    border: none;
+    cursor: pointer;
+    padding: 0 28px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    letter-spacing: 2px;
+    color: white;
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+
+  .search-btn:hover { background: #e01030; }
+  .search-btn:active { background: #b00e28; }
+  .search-btn:disabled { background: #444; cursor: not-allowed; }
+
+  /* Amp display */
+  .amp-panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    display: none;
+    animation: fadeUp 0.5s ease;
+  }
+
+  .amp-panel.visible { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .amp-header {
+    background: linear-gradient(135deg, #1e2024 0%, #16181b 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .song-info h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px;
+    letter-spacing: 2px;
+    color: var(--fender-cream);
+  }
+
+  .song-info p {
+    font-size: 13px;
+    color: var(--muted);
+    font-family: 'Share Tech Mono', monospace;
+    margin-top: 2px;
+  }
+
+  .confidence-badge {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 2px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .confidence-high { background: rgba(34,197,94,0.15); color: var(--green); border: 1px solid rgba(34,197,94,0.3); }
+  .confidence-medium { background: rgba(245,158,11,0.15); color: var(--amber); border: 1px solid rgba(245,158,11,0.3); }
+  .confidence-low { background: rgba(200,16,46,0.15); color: var(--glow); border: 1px solid rgba(200,16,46,0.3); }
+
+  /* Preset display */
+  .preset-row {
+    background: #13151a;
+    border-bottom: 1px solid var(--border);
+    padding: 14px 28px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .preset-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    white-space: nowrap;
+  }
+
+  .preset-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 2px;
+    color: var(--fender-red);
+    text-shadow: 0 0 20px rgba(200,16,46,0.5);
+  }
+
+  /* Knobs section */
+  .knobs-section {
+    padding: 30px 28px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 24px;
+  }
+
+  .knobs-grid {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .knob-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 70px;
+  }
+
+  .knob-container {
+    position: relative;
+    width: 70px;
+    height: 70px;
+  }
+
+  .knob-outer {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #3a3d45, #1a1c20);
+    border: 2px solid var(--knob-ring);
+    position: relative;
+    box-shadow: 
+      0 4px 12px rgba(0,0,0,0.6),
+      inset 0 1px 0 rgba(255,255,255,0.05),
+      0 0 0 1px rgba(0,0,0,0.3);
+  }
+
+  .knob-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 3px;
+    height: 24px;
+    background: linear-gradient(to bottom, var(--glow), transparent);
+    transform-origin: bottom center;
+    border-radius: 2px;
+    margin-left: -1.5px;
+    margin-top: -24px;
+    box-shadow: 0 0 8px var(--glow);
+    transition: transform 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .knob-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    background: radial-gradient(circle, #2a2d32, #1a1c1f);
+    border-radius: 50%;
+    border: 1px solid var(--border);
+  }
+
+  /* Tick marks */
+  .knob-ticks {
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+  }
+
+  .knob-value-display {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 18px;
+    color: var(--glow);
+    text-shadow: 0 0 12px var(--glow);
+    line-height: 1;
+  }
+
+  .knob-name {
+    font-size: 9px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-align: center;
+  }
+
+  /* Effects section */
+  .effects-section {
+    padding: 24px 28px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .effects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .effect-slot {
+    background: #13151a;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .effect-slot.active {
+    border-color: rgba(200,16,46,0.4);
+    background: rgba(200,16,46,0.05);
+  }
+
+  .effect-type {
+    font-size: 9px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  .effect-name {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    color: var(--fender-cream);
+  }
+
+  .effect-slot.active .effect-name {
+    color: var(--fender-red);
+  }
+
+  .effect-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--border);
+    align-self: flex-end;
+    margin-top: 4px;
+  }
+
+  .effect-slot.active .effect-dot {
+    background: var(--fender-red);
+    box-shadow: 0 0 8px var(--fender-red);
+  }
+
+  /* Notes */
+  .notes-section {
+    padding: 24px 28px;
+  }
+
+  .notes-text {
+    font-size: 14px;
+    color: #9ca3af;
+    line-height: 1.7;
+    font-style: italic;
+    border-left: 2px solid var(--fender-red);
+    padding-left: 16px;
+  }
+
+  /* Loading */
+  .loading-state {
+    text-align: center;
+    padding: 60px 20px;
+    display: none;
+  }
+
+  .loading-state.visible { display: block; }
+
+  .loading-amp {
+    width: 60px;
+    height: 60px;
+    border: 2px solid var(--border);
+    border-top-color: var(--fender-red);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 20px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-text {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  /* Error */
+  .error-state {
+    text-align: center;
+    padding: 40px 20px;
+    display: none;
+    color: var(--glow);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+  }
+
+  .error-state.visible { display: block; }
+
+  /* Recent searches */
+  .recent-section {
+    margin-top: 40px;
+    display: none;
+  }
+
+  .recent-section.visible { display: block; }
+
+  .recent-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 12px;
+  }
+
+  .recent-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .recent-chip {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 6px 14px;
+    border-radius: 2px;
+    font-size: 12px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .recent-chip:hover {
+    border-color: var(--fender-red);
+    color: var(--fender-cream);
+  }
+
+  @media (max-width: 600px) {
+    header { padding: 16px 20px; }
+    main { padding: 30px 16px 60px; }
+    .knobs-grid { gap: 12px; }
+    .knob-container { width: 56px; height: 56px; }
+    .knob-outer { width: 56px; height: 56px; }
+    .search-btn { padding: 0 18px; font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-mark">F</div>
+    <div>
+      <div class="logo-text">Mustang Tone</div>
+      <div class="logo-sub">LT 25 · Settings Finder</div>
+    </div>
+  </div>
+  <div class="header-badge">AI Powered</div>
+</header>
+
+<main>
+  <div class="search-section">
+    <div class="search-headline">DIAL IN YOUR <span>TONE</span></div>
+    <p class="search-sub">Enter any song and get Fender Mustang LT 25 settings to match it</p>
+
+    <div class="search-box">
+      <div class="search-inputs">
+        <input type="text" id="songInput" placeholder="Song title..." autocomplete="off" />
+        <input type="text" id="artistInput" placeholder="Artist (optional)..." autocomplete="off" />
+      </div>
+      <button class="search-btn" id="searchBtn" onclick="getSettings()">FIND TONE</button>
+    </div>
+  </div>
+
+  <div class="loading-state" id="loadingState">
+    <div class="loading-amp"></div>
+    <div class="loading-text">Dialing in your tone...</div>
+  </div>
+
+  <div class="error-state" id="errorState"></div>
+
+  <div class="amp-panel" id="ampPanel">
+    <div class="amp-header">
+      <div class="song-info">
+        <h2 id="resultSong">—</h2>
+        <p id="resultArtist">—</p>
+      </div>
+      <span class="confidence-badge" id="confidenceBadge">—</span>
+    </div>
+
+    <div class="preset-row">
+      <span class="preset-label">Amp Model / Preset</span>
+      <span class="preset-value" id="presetValue">—</span>
+    </div>
+
+    <div class="knobs-section">
+      <div class="section-label">// Tone Controls</div>
+      <div class="knobs-grid">
+        <div class="knob-wrapper">
+          <div class="knob-container">
+            <svg class="knob-ticks" viewBox="0 0 82 82">
+              <!-- tick marks -->
+              <g id="ticks" stroke="#333" stroke-width="1.5" stroke-linecap="round"></g>
+            </svg>
+            <div class="knob-outer" id="knob-gain">
+              <div class="knob-indicator" id="ind-gain"></div>
+              <div class="knob-center"></div>
+            </div>
+          </div>
+          <div class="knob-value-display" id="val-gain">0</div>
+          <div class="knob-name">Gain</div>
+        </div>
+        <div class="knob-wrapper">
+          <div class="knob-container">
+            <div class="knob-outer">
+              <div class="knob-indicator" id="ind-treble"></div>
+              <div class="knob-center"></div>
+            </div>
+          </div>
+          <div class="knob-value-display" id="val-treble">0</div>
+          <div class="knob-name">Treble</div>
+        </div>
+        <div class="knob-wrapper">
+          <div class="knob-container">
+            <div class="knob-outer">
+              <div class="knob-indicator" id="ind-middle"></div>
+              <div class="knob-center"></div>
+            </div>
+          </div>
+          <div class="knob-value-display" id="val-middle">0</div>
+          <div class="knob-name">Middle</div>
+        </div>
+        <div class="knob-wrapper">
+          <div class="knob-container">
+            <div class="knob-outer">
+              <div class="knob-indicator" id="ind-bass"></div>
+              <div class="knob-center"></div>
+            </div>
+          </div>
+          <div class="knob-value-display" id="val-bass">0</div>
+          <div class="knob-name">Bass</div>
+        </div>
+        <div class="knob-wrapper">
+          <div class="knob-container">
+            <div class="knob-outer">
+              <div class="knob-indicator" id="ind-reverb"></div>
+              <div class="knob-center"></div>
+            </div>
+          </div>
+          <div class="knob-value-display" id="val-reverb">0</div>
+          <div class="knob-name">Reverb</div>
+        </div>
+        <div class="knob-wrapper">
+          <div class="knob-container">
+            <div class="knob-outer">
+              <div class="knob-indicator" id="ind-volume"></div>
+              <div class="knob-center"></div>
+            </div>
+          </div>
+          <div class="knob-value-display" id="val-volume">0</div>
+          <div class="knob-name">Volume</div>
+        </div>
+        <div class="knob-wrapper">
+          <div class="knob-container">
+            <div class="knob-outer">
+              <div class="knob-indicator" id="ind-master"></div>
+              <div class="knob-center"></div>
+            </div>
+          </div>
+          <div class="knob-value-display" id="val-master">0</div>
+          <div class="knob-name">Master</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="effects-section">
+      <div class="section-label">// Effects Chain</div>
+      <div class="effects-grid">
+        <div class="effect-slot" id="fx-stomp">
+          <span class="effect-type">Stompbox</span>
+          <span class="effect-name" id="fx-stomp-name">None</span>
+          <span class="effect-dot"></span>
+        </div>
+        <div class="effect-slot" id="fx-mod">
+          <span class="effect-type">Modulation</span>
+          <span class="effect-name" id="fx-mod-name">None</span>
+          <span class="effect-dot"></span>
+        </div>
+        <div class="effect-slot" id="fx-delay">
+          <span class="effect-type">Delay</span>
+          <span class="effect-name" id="fx-delay-name">None</span>
+          <span class="effect-dot"></span>
+        </div>
+        <div class="effect-slot" id="fx-rev">
+          <span class="effect-type">Reverb Type</span>
+          <span class="effect-name" id="fx-rev-name">None</span>
+          <span class="effect-dot"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="notes-section">
+      <div class="section-label">// Tone Notes</div>
+      <p class="notes-text" id="toneNotes">—</p>
+    </div>
+  </div>
+
+  <div class="recent-section" id="recentSection">
+    <div class="recent-label">// Recent searches</div>
+    <div class="recent-chips" id="recentChips"></div>
+  </div>
+</main>
+
+<script>
+  let recentSearches = JSON.parse(sessionStorage.getItem('recentSearches') || '[]');
+
+  function knobAngle(value) {
+    // Knob range: -135deg (0) to +135deg (10)
+    return -135 + (value / 10) * 270;
+  }
+
+  function setKnob(id, value) {
+    const ind = document.getElementById('ind-' + id);
+    const val = document.getElementById('val-' + id);
+    if (!ind) return;
+    const angle = knobAngle(value);
+    // Indicator rotation: starts pointing up (0deg), rotate by angle
+    ind.style.transform = `rotate(${angle}deg)`;
+    val.textContent = value;
+  }
+
+  function setEffect(slotId, nameId, value) {
+    const slot = document.getElementById(slotId);
+    const name = document.getElementById(nameId);
+    const isActive = value && value.toLowerCase() !== 'none' && value !== '0';
+    name.textContent = isActive ? value : 'None';
+    slot.classList.toggle('active', isActive);
+  }
+
+  function renderSettings(data) {
+    document.getElementById('resultSong').textContent = data.song || 'Unknown Song';
+    document.getElementById('resultArtist').textContent = data.artist || '';
+    document.getElementById('presetValue').textContent = data.preset || '—';
+
+    const badge = document.getElementById('confidenceBadge');
+    badge.textContent = (data.confidence || 'medium').toUpperCase() + ' CONFIDENCE';
+    badge.className = 'confidence-badge confidence-' + (data.confidence || 'medium');
+
+    // Animate knobs after a tick
+    setTimeout(() => {
+      setKnob('gain', data.gain ?? 5);
+      setKnob('treble', data.treble ?? 5);
+      setKnob('middle', data.middle ?? 5);
+      setKnob('bass', data.bass ?? 5);
+      setKnob('reverb', data.reverb ?? 3);
+      setKnob('volume', data.volume ?? 6);
+      setKnob('master', data.master ?? 5);
+    }, 100);
+
+    setEffect('fx-stomp', 'fx-stomp-name', data.stompbox);
+    setEffect('fx-mod', 'fx-mod-name', data.modulation);
+    setEffect('fx-delay', 'fx-delay-name', data.delay && data.delay !== 'None' ? 
+      `${data.delay}${data.delay_time_ms ? ' · ' + data.delay_time_ms + 'ms' : ''}` : null);
+    setEffect('fx-rev', 'fx-rev-name', data.reverb_type);
+
+    document.getElementById('toneNotes').textContent = data.notes || '—';
+
+    document.getElementById('ampPanel').classList.add('visible');
+  }
+
+  async function getSettings() {
+    const song = document.getElementById('songInput').value.trim();
+    const artist = document.getElementById('artistInput').value.trim();
+    if (!song) {
+      document.getElementById('songInput').focus();
+      return;
+    }
+
+    document.getElementById('ampPanel').classList.remove('visible');
+    document.getElementById('errorState').classList.remove('visible');
+    document.getElementById('loadingState').classList.add('visible');
+    document.getElementById('searchBtn').disabled = true;
+
+    try {
+      const res = await fetch('/api/get-settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ song, artist })
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Request failed');
+
+      renderSettings(data);
+
+      // Save to recent
+      const key = artist ? `${song} — ${artist}` : song;
+      recentSearches = [{ song, artist, label: key }, ...recentSearches.filter(s => s.label !== key)].slice(0, 6);
+      sessionStorage.setItem('recentSearches', JSON.stringify(recentSearches));
+      renderRecent();
+
+    } catch (err) {
+      const errEl = document.getElementById('errorState');
+      errEl.textContent = '⚠ ' + (err.message || 'Something went wrong. Try again.');
+      errEl.classList.add('visible');
+    } finally {
+      document.getElementById('loadingState').classList.remove('visible');
+      document.getElementById('searchBtn').disabled = false;
+    }
+  }
+
+  function renderRecent() {
+    if (!recentSearches.length) return;
+    const section = document.getElementById('recentSection');
+    const chips = document.getElementById('recentChips');
+    section.classList.add('visible');
+    chips.innerHTML = recentSearches.map(s => 
+      `<span class="recent-chip" onclick="loadRecent('${encodeURIComponent(s.song)}','${encodeURIComponent(s.artist || '')}')">${s.label}</span>`
+    ).join('');
+  }
+
+  function loadRecent(song, artist) {
+    document.getElementById('songInput').value = decodeURIComponent(song);
+    document.getElementById('artistInput').value = decodeURIComponent(artist);
+    getSettings();
+  }
+
+  // Enter key support
+  document.getElementById('songInput').addEventListener('keydown', e => e.key === 'Enter' && getSettings());
+  document.getElementById('artistInput').addEventListener('keydown', e => e.key === 'Enter' && getSettings());
+
+  renderRecent();
+</script>
+</body>
+</html>
