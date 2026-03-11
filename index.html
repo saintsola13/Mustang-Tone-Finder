@@ -622,16 +622,6 @@
         <div class="knob-wrapper">
           <div class="knob-container">
             <div class="knob-outer">
-              <div class="knob-indicator" id="ind-middle"></div>
-              <div class="knob-center"></div>
-            </div>
-          </div>
-          <div class="knob-value-display" id="val-middle">0</div>
-          <div class="knob-name">Middle</div>
-        </div>
-        <div class="knob-wrapper">
-          <div class="knob-container">
-            <div class="knob-outer">
               <div class="knob-indicator" id="ind-bass"></div>
               <div class="knob-center"></div>
             </div>
@@ -642,22 +632,22 @@
         <div class="knob-wrapper">
           <div class="knob-container">
             <div class="knob-outer">
-              <div class="knob-indicator" id="ind-reverb"></div>
-              <div class="knob-center"></div>
-            </div>
-          </div>
-          <div class="knob-value-display" id="val-reverb">0</div>
-          <div class="knob-name">Reverb</div>
-        </div>
-        <div class="knob-wrapper">
-          <div class="knob-container">
-            <div class="knob-outer">
               <div class="knob-indicator" id="ind-volume"></div>
               <div class="knob-center"></div>
             </div>
           </div>
           <div class="knob-value-display" id="val-volume">0</div>
           <div class="knob-name">Volume</div>
+        </div>
+        <div class="knob-wrapper">
+          <div class="knob-container">
+            <div class="knob-outer">
+              <div class="knob-indicator" id="ind-fx"></div>
+              <div class="knob-center"></div>
+            </div>
+          </div>
+          <div class="knob-value-display" id="val-fx">0</div>
+          <div class="knob-name">FX</div>
         </div>
         <div class="knob-wrapper">
           <div class="knob-container">
@@ -749,11 +739,10 @@
     setTimeout(() => {
       setKnob('gain', data.gain ?? 5);
       setKnob('treble', data.treble ?? 5);
-      setKnob('middle', data.middle ?? 5);
       setKnob('bass', data.bass ?? 5);
-      setKnob('reverb', data.reverb ?? 3);
       setKnob('volume', data.volume ?? 6);
       setKnob('master', data.master ?? 5);
+      setKnob('fx', data.fx ?? 4);
     }, 100);
 
     setEffect('fx-stomp', 'fx-stomp-name', data.stompbox);
