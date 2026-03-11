@@ -8,7 +8,7 @@ export async function handler(event) {
     return { statusCode: 400, body: JSON.stringify({ error: 'Song is required' }) };
   }
 
-  const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyBnWlpZ4g7d6gUSwGID8VabVPYX9ZpW540';
+  const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
   const prompt = `You are an expert guitarist and amp technician specializing in the Fender Mustang LT 25 amplifier.
 
