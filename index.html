@@ -571,6 +571,99 @@
     color: var(--fender-cream);
   }
 
+  /* Both mode comparison view */
+  .both-view {
+    display: none;
+    gap: 20px;
+    margin-top: 16px;
+  }
+  .both-view.visible {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .both-col {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+  }
+  .both-col-header {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 2px;
+    color: var(--fender-red);
+    margin-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+  }
+  .both-preset {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+  .both-preset span {
+    color: var(--fender-cream);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+  }
+  .both-knobs-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .both-knob-item {
+    background: var(--knob-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 6px 8px;
+    text-align: center;
+  }
+  .both-knob-val {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 18px;
+    color: var(--fender-cream);
+    line-height: 1;
+  }
+  .both-knob-name {
+    font-size: 9px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 3px;
+  }
+  .both-fx-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .both-fx-item {
+    font-size: 11px;
+    border-left: 2px solid var(--border);
+    padding-left: 8px;
+  }
+  .both-fx-item.active {
+    border-left-color: var(--fender-red);
+  }
+  .both-fx-type {
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 9px;
+  }
+  .both-fx-name {
+    color: var(--fender-cream);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+  }
+  .both-fx-params {
+    color: var(--muted);
+    font-size: 10px;
+    margin-top: 2px;
+  }
+
   @media (max-width: 600px) {
     header { padding: 16px 20px; }
     main { padding: 30px 16px 60px; }
@@ -578,6 +671,7 @@
     .knob-container { width: 56px; height: 56px; }
     .knob-outer { width: 56px; height: 56px; }
     .search-btn { padding: 0 18px; font-size: 14px; }
+    .both-view.visible { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -591,7 +685,7 @@
       <div class="logo-sub">LT 25 · Settings Finder</div>
     </div>
   </div>
-  <div class="header-badge">AI Powered</div>
+  <div class="header-badge">INTERNAL DB</div>
 </header>
 
 <main>
@@ -631,8 +725,9 @@
 
     <div class="knobs-section">
       <div class="mode-toggle">
-        <button class="mode-btn active" id="btnRhythm" onclick="setMode('rhythm')">RHYTHM</button>
+        <button class="mode-btn active" id="btnRhythm" onclick="setMode('rhythm')">FULL SONG</button>
         <button class="mode-btn" id="btnSolo" onclick="setMode('solo')">SOLO</button>
+        <button class="mode-btn" id="btnBoth" onclick="setMode('both')">BOTH</button>
       </div>
       <div class="section-label">// Tone Controls</div>
       <div class="knobs-grid">
@@ -735,6 +830,24 @@
     </div>
   </div>
 
+  <!-- Both mode comparison view -->
+  <div class="both-view" id="bothView">
+    <div class="both-col">
+      <div class="both-col-header">FULL SONG</div>
+      <div class="both-preset">Amp Model: <span id="b-full-preset">—</span></div>
+      <div class="both-knobs-grid" id="b-full-knobs"></div>
+      <div class="section-label" style="margin-bottom:8px">// Effects</div>
+      <div class="both-fx-list" id="b-full-fx"></div>
+    </div>
+    <div class="both-col">
+      <div class="both-col-header">SOLO</div>
+      <div class="both-preset">Amp Model: <span id="b-solo-preset">—</span></div>
+      <div class="both-knobs-grid" id="b-solo-knobs"></div>
+      <div class="section-label" style="margin-bottom:8px">// Effects</div>
+      <div class="both-fx-list" id="b-solo-fx"></div>
+    </div>
+  </div>
+
   <div class="recent-section" id="recentSection">
     <div class="recent-label">// Recent searches</div>
     <div class="recent-chips" id="recentChips"></div>
@@ -749,15 +862,15 @@ const SONGS = [
   {
     song: "smells like teen spirit", artist: "nirvana",
     rhythm: {
-      preset: "JCM", gain: 8, treble: 6, bass: 7, volume: 7, master: 6, fx: 4,
+      preset: "British 800", gain: 8, treble: 6, bass: 7, volume: 7, master: 6, fx: 4,
       stompbox: { name: "None" },
       modulation: { name: "None" },
       delay: { name: "None" },
       reverb: { type: "Room", decay: 3, tone: 5, level: 3 }
     },
     solo: {
-      preset: "JCM", gain: 9, treble: 7, bass: 6, volume: 8, master: 7, fx: 5,
-      stompbox: { name: "Overdrive", level: 7, gain: 4, tone: 6 },
+      preset: "British 800", gain: 9, treble: 7, bass: 6, volume: 8, master: 7, fx: 5,
+      stompbox: { name: "Vintage Drive", level: 7, gain: 4, tone: 6 },
       modulation: { name: "None" },
       delay: { name: "None" },
       reverb: { type: "Room", decay: 4, tone: 5, level: 4 }
@@ -767,14 +880,14 @@ const SONGS = [
   {
     song: "come as you are", artist: "nirvana",
     rhythm: {
-      preset: "JCM", gain: 6, treble: 5, bass: 6, volume: 6, master: 6, fx: 5,
+      preset: "British 800", gain: 6, treble: 5, bass: 6, volume: 6, master: 6, fx: 5,
       stompbox: { name: "None" },
       modulation: { name: "Chorus", rate: 3, depth: 5, level: 5 },
       delay: { name: "None" },
       reverb: { type: "Room", decay: 3, tone: 5, level: 3 }
     },
     solo: {
-      preset: "JCM", gain: 7, treble: 6, bass: 6, volume: 7, master: 6, fx: 5,
+      preset: "British 800", gain: 7, treble: 6, bass: 6, volume: 7, master: 6, fx: 5,
       stompbox: { name: "None" },
       modulation: { name: "Chorus", rate: 3, depth: 4, level: 4 },
       delay: { name: "None" },
@@ -785,15 +898,15 @@ const SONGS = [
   {
     song: "back in black", artist: "ac/dc",
     rhythm: {
-      preset: "Plexi Drive", gain: 6, treble: 7, bass: 6, volume: 8, master: 7, fx: 3,
+      preset: "British Watts", gain: 6, treble: 7, bass: 6, volume: 8, master: 7, fx: 3,
       stompbox: { name: "None" },
       modulation: { name: "None" },
       delay: { name: "None" },
       reverb: { type: "Spring", decay: 2, tone: 5, level: 2 }
     },
     solo: {
-      preset: "Plexi Drive", gain: 8, treble: 7, bass: 5, volume: 8, master: 8, fx: 4,
-      stompbox: { name: "Boost", level: 7, gain: 3, tone: 7 },
+      preset: "British Watts", gain: 8, treble: 7, bass: 5, volume: 8, master: 8, fx: 4,
+      stompbox: { name: "Ranger Boost", level: 7, gain: 3, tone: 7 },
       modulation: { name: "None" },
       delay: { name: "None" },
       reverb: { type: "Spring", decay: 2, tone: 5, level: 2 }
@@ -803,15 +916,15 @@ const SONGS = [
   {
     song: "highway to hell", artist: "ac/dc",
     rhythm: {
-      preset: "Plexi Drive", gain: 6, treble: 7, bass: 6, volume: 8, master: 7, fx: 3,
+      preset: "British Watts", gain: 6, treble: 7, bass: 6, volume: 8, master: 7, fx: 3,
       stompbox: { name: "None" },
       modulation: { name: "None" },
       delay: { name: "None" },
       reverb: { type: "Spring", decay: 2, tone: 5, level: 2 }
     },
     solo: {
-      preset: "Plexi Drive", gain: 8, treble: 8, bass: 5, volume: 8, master: 8, fx: 4,
-      stompbox: { name: "Boost", level: 8, gain: 3, tone: 7 },
+      preset: "British Watts", gain: 8, treble: 8, bass: 5, volume: 8, master: 8, fx: 4,
+      stompbox: { name: "Ranger Boost", level: 8, gain: 3, tone: 7 },
       modulation: { name: "None" },
       delay: { name: "None" },
       reverb: { type: "Spring", decay: 2, tone: 6, level: 2 }
@@ -821,14 +934,14 @@ const SONGS = [
   {
     song: "whole lotta love", artist: "led zeppelin",
     rhythm: {
-      preset: "Plexi Drive", gain: 7, treble: 6, bass: 7, volume: 7, master: 7, fx: 4,
+      preset: "British Watts", gain: 7, treble: 6, bass: 7, volume: 7, master: 7, fx: 4,
       stompbox: { name: "None" },
       modulation: { name: "None" },
       delay: { name: "None" },
       reverb: { type: "Room", decay: 3, tone: 5, level: 3 }
     },
     solo: {
-      preset: "Plexi Drive", gain: 8, treble: 7, bass: 6, volume: 8, master: 7, fx: 5,
+      preset: "British Watts", gain: 8, treble: 7, bass: 6, volume: 8, master: 7, fx: 5,
       stompbox: { name: "None" },
       modulation: { name: "None" },
       delay: { name: "Tape Delay", time_ms: 280, feedback: 3, level: 4 },
@@ -839,17 +952,17 @@ const SONGS = [
   {
     song: "stairway to heaven", artist: "led zeppelin",
     rhythm: {
-      preset: "Boutique", gain: 4, treble: 6, bass: 5, volume: 6, master: 5, fx: 5,
+      preset: "Deluxe Reverb", gain: 4, treble: 6, bass: 5, volume: 6, master: 5, fx: 5,
       stompbox: { name: "None" },
       modulation: { name: "None" },
-      delay: { name: "Analog Delay", time_ms: 350, feedback: 3, level: 4 },
+      delay: { name: "Tape Delay", time_ms: 350, feedback: 3, level: 4 },
       reverb: { type: "Hall", decay: 5, tone: 5, level: 5 }
     },
     solo: {
-      preset: "Plexi Drive", gain: 7, treble: 7, bass: 6, volume: 8, master: 7, fx: 5,
-      stompbox: { name: "Overdrive", level: 6, gain: 5, tone: 6 },
+      preset: "British Watts", gain: 7, treble: 7, bass: 6, volume: 8, master: 7, fx: 5,
+      stompbox: { name: "Vintage Drive", level: 6, gain: 5, tone: 6 },
       modulation: { name: "None" },
-      delay: { name: "Analog Delay", time_ms: 380, feedback: 4, level: 5 },
+      delay: { name: "Tape Delay", time_ms: 380, feedback: 4, level: 5 },
       reverb: { type: "Hall", decay: 5, tone: 5, level: 5 }
     },
     confidence: "high", notes: "Clean fingerpicking to start, then blast into the solo. Completely different sounds."
@@ -857,15 +970,15 @@ const SONGS = [
   {
     song: "sweet child o mine", artist: "guns n roses",
     rhythm: {
-      preset: "JCM", gain: 7, treble: 6, bass: 6, volume: 7, master: 7, fx: 5,
+      preset: "British 800", gain: 7, treble: 6, bass: 6, volume: 7, master: 7, fx: 5,
       stompbox: { name: "None" },
       modulation: { name: "Chorus", rate: 2, depth: 4, level: 4 },
       delay: { name: "None" },
       reverb: { type: "Room", decay: 3, tone: 5, level: 3 }
     },
     solo: {
-      preset: "JCM", gain: 8, treble: 7, bass: 6, volume: 8, master: 8, fx: 5,
-      stompbox: { name: "Overdrive", level: 7, gain: 5, tone: 6 },
+      preset: "British 800", gain: 8, treble: 7, bass: 6, volume: 8, master: 8, fx: 5,
+      stompbox: { name: "Vintage Drive", level: 7, gain: 5, tone: 6 },
       modulation: { name: "None" },
       delay: { name: "None" },
       reverb: { type: "Room", decay: 4, tone: 5, level: 4 }
@@ -875,14 +988,14 @@ const SONGS = [
   {
     song: "purple haze", artist: "jimi hendrix",
     rhythm: {
-      preset: "Plexi Drive", gain: 7, treble: 7, bass: 5, volume: 7, master: 7, fx: 5,
+      preset: "British Watts", gain: 7, treble: 7, bass: 5, volume: 7, master: 7, fx: 5,
       stompbox: { name: "Fuzz", level: 8, sustain: 7, tone: 6 },
       modulation: { name: "None" },
       delay: { name: "None" },
       reverb: { type: "Spring", decay: 4, tone: 5, level: 4 }
     },
     solo: {
-      preset: "Plexi Drive", gain: 8, treble: 7, bass: 5, volume: 8, master: 8, fx: 6,
+      preset: "British Watts", gain: 8, treble: 7, bass: 5, volume: 8, master: 8, fx: 6,
       stompbox: { name: "Fuzz", level: 9, sustain: 8, tone: 6 },
       modulation: { name: "None" },
       delay: { name: "None" },
@@ -893,17 +1006,17 @@ const SONGS = [
   {
     song: "comfortably numb", artist: "pink floyd",
     rhythm: {
-      preset: "Clean Twin", gain: 3, treble: 6, bass: 6, volume: 6, master: 5, fx: 6,
+      preset: "'65 Twin Reverb", gain: 3, treble: 6, bass: 6, volume: 6, master: 5, fx: 6,
       stompbox: { name: "None" },
       modulation: { name: "Chorus", rate: 2, depth: 4, level: 5 },
-      delay: { name: "Digital Delay", time_ms: 500, feedback: 5, level: 5 },
+      delay: { name: "Mono Delay", time_ms: 500, feedback: 5, level: 5 },
       reverb: { type: "Hall", decay: 7, tone: 5, level: 6 }
     },
     solo: {
-      preset: "Boutique", gain: 5, treble: 6, bass: 6, volume: 7, master: 6, fx: 7,
-      stompbox: { name: "Overdrive", level: 6, gain: 4, tone: 5 },
+      preset: "Deluxe Reverb", gain: 5, treble: 6, bass: 6, volume: 7, master: 6, fx: 7,
+      stompbox: { name: "Vintage Drive", level: 6, gain: 4, tone: 5 },
       modulation: { name: "Chorus", rate: 2, depth: 5, level: 5 },
-      delay: { name: "Digital Delay", time_ms: 500, feedback: 6, level: 6 },
+      delay: { name: "Mono Delay", time_ms: 500, feedback: 6, level: 6 },
       reverb: { type: "Hall", decay: 8, tone: 5, level: 7 }
     },
     confidence: "high", notes: "Gilmour's singing sustain. Space and delay are everything. Solo needs more drive and reverb."
@@ -911,17 +1024,17 @@ const SONGS = [
   {
     song: "enter sandman", artist: "metallica",
     rhythm: {
-      preset: "Metal 2000", gain: 9, treble: 7, bass: 8, volume: 7, master: 7, fx: 3,
+      preset: "Full Moon Distortion", gain: 9, treble: 7, bass: 8, volume: 7, master: 7, fx: 3,
       stompbox: { name: "None" },
       modulation: { name: "None" },
       delay: { name: "None" },
       reverb: { type: "Room", decay: 2, tone: 5, level: 2 }
     },
     solo: {
-      preset: "Metal 2000", gain: 9, treble: 7, bass: 7, volume: 8, master: 8, fx: 4,
-      stompbox: { name: "Overdrive", level: 6, gain: 3, tone: 6 },
+      preset: "Full Moon Distortion", gain: 9, treble: 7, bass: 7, volume: 8, master: 8, fx: 4,
+      stompbox: { name: "Vintage Drive", level: 6, gain: 3, tone: 6 },
       modulation: { name: "None" },
-      delay: { name: "Digital Delay", time_ms: 300, feedback: 3, level: 4 },
+      delay: { name: "Mono Delay", time_ms: 300, feedback: 3, level: 4 },
       reverb: { type: "Room", decay: 3, tone: 5, level: 3 }
     },
     confidence: "high", notes: "Scooped mids, maximum palm muting. Tight and crushing."
@@ -929,17 +1042,17 @@ const SONGS = [
   {
     song: "master of puppets", artist: "metallica",
     rhythm: {
-      preset: "Metal 2000", gain: 9, treble: 7, bass: 8, volume: 7, master: 8, fx: 3,
+      preset: "Full Moon Distortion", gain: 9, treble: 7, bass: 8, volume: 7, master: 8, fx: 3,
       stompbox: { name: "None" },
       modulation: { name: "None" },
       delay: { name: "None" },
       reverb: { type: "Room", decay: 1, tone: 5, level: 2 }
     },
     solo: {
-      preset: "Metal 2000", gain: 9, treble: 8, bass: 6, volume: 8, master: 8, fx: 5,
-      stompbox: { name: "Overdrive", level: 7, gain: 4, tone: 7 },
+      preset: "Full Moon Distortion", gain: 9, treble: 8, bass: 6, volume: 8, master: 8, fx: 5,
+      stompbox: { name: "Vintage Drive", level: 7, gain: 4, tone: 7 },
       modulation: { name: "None" },
-      delay: { name: "Digital Delay", time_ms: 250, feedback: 3, level: 4 },
+      delay: { name: "Mono Delay", time_ms: 250, feedback: 3, level: 4 },
       reverb: { type: "Room", decay: 3, tone: 6, level: 3 }
     },
     confidence: "high", notes: "Downpick hard for rhythm. Kirk's solos need more treble and a touch of delay."
@@ -947,15 +1060,15 @@ const SONGS = [
   {
     song: "pride and joy", artist: "stevie ray vaughan",
     rhythm: {
-      preset: "Texas Crunch", gain: 5, treble: 7, bass: 6, volume: 8, master: 7, fx: 4,
+      preset: "Blues Jr", gain: 5, treble: 7, bass: 6, volume: 8, master: 7, fx: 4,
       stompbox: { name: "None" },
       modulation: { name: "None" },
       delay: { name: "None" },
       reverb: { type: "Spring", decay: 4, tone: 6, level: 4 }
     },
     solo: {
-      preset: "Texas Crunch", gain: 6, treble: 7, bass: 6, volume: 9, master: 8, fx: 5,
-      stompbox: { name: "Overdrive", level: 7, gain: 3, tone: 7 },
+      preset: "Blues Jr", gain: 6, treble: 7, bass: 6, volume: 9, master: 8, fx: 5,
+      stompbox: { name: "Vintage Drive", level: 7, gain: 3, tone: 7 },
       modulation: { name: "None" },
       delay: { name: "None" },
       reverb: { type: "Spring", decay: 5, tone: 6, level: 5 }
@@ -965,14 +1078,14 @@ const SONGS = [
   {
     song: "the thrill is gone", artist: "bb king",
     rhythm: {
-      preset: "Blues", gain: 4, treble: 5, bass: 6, volume: 6, master: 5, fx: 4,
+      preset: "'59 Bassman", gain: 4, treble: 5, bass: 6, volume: 6, master: 5, fx: 4,
       stompbox: { name: "None" },
       modulation: { name: "None" },
       delay: { name: "None" },
       reverb: { type: "Spring", decay: 5, tone: 4, level: 5 }
     },
     solo: {
-      preset: "Blues", gain: 5, treble: 5, bass: 6, volume: 7, master: 6, fx: 4,
+      preset: "'59 Bassman", gain: 5, treble: 5, bass: 6, volume: 7, master: 6, fx: 4,
       stompbox: { name: "None" },
       modulation: { name: "None" },
       delay: { name: "None" },
@@ -983,17 +1096,17 @@ const SONGS = [
   {
     song: "with or without you", artist: "u2",
     rhythm: {
-      preset: "Clean Twin", gain: 2, treble: 6, bass: 5, volume: 6, master: 5, fx: 7,
+      preset: "'65 Twin Reverb", gain: 2, treble: 6, bass: 5, volume: 6, master: 5, fx: 7,
       stompbox: { name: "None" },
       modulation: { name: "None" },
-      delay: { name: "Digital Delay", time_ms: 420, feedback: 5, level: 6 },
+      delay: { name: "Mono Delay", time_ms: 420, feedback: 5, level: 6 },
       reverb: { type: "Hall", decay: 7, tone: 5, level: 7 }
     },
     solo: {
-      preset: "Clean Twin", gain: 2, treble: 6, bass: 5, volume: 7, master: 5, fx: 8,
+      preset: "'65 Twin Reverb", gain: 2, treble: 6, bass: 5, volume: 7, master: 5, fx: 8,
       stompbox: { name: "None" },
       modulation: { name: "None" },
-      delay: { name: "Digital Delay", time_ms: 420, feedback: 6, level: 7 },
+      delay: { name: "Mono Delay", time_ms: 420, feedback: 6, level: 7 },
       reverb: { type: "Hall", decay: 8, tone: 5, level: 8 }
     },
     confidence: "high", notes: "The Edge's dotted 8th delay is the whole song. Push feedback and level for the swell."
@@ -1001,17 +1114,17 @@ const SONGS = [
   {
     song: "hotel california", artist: "eagles",
     rhythm: {
-      preset: "Clean Twin", gain: 3, treble: 6, bass: 5, volume: 6, master: 5, fx: 6,
+      preset: "'65 Twin Reverb", gain: 3, treble: 6, bass: 5, volume: 6, master: 5, fx: 6,
       stompbox: { name: "None" },
       modulation: { name: "Chorus", rate: 2, depth: 4, level: 5 },
-      delay: { name: "Analog Delay", time_ms: 350, feedback: 3, level: 4 },
+      delay: { name: "Tape Delay", time_ms: 350, feedback: 3, level: 4 },
       reverb: { type: "Hall", decay: 6, tone: 5, level: 5 }
     },
     solo: {
-      preset: "Clean Twin", gain: 4, treble: 7, bass: 5, volume: 7, master: 6, fx: 6,
-      stompbox: { name: "Overdrive", level: 5, gain: 4, tone: 6 },
+      preset: "'65 Twin Reverb", gain: 4, treble: 7, bass: 5, volume: 7, master: 6, fx: 6,
+      stompbox: { name: "Vintage Drive", level: 5, gain: 4, tone: 6 },
       modulation: { name: "Chorus", rate: 2, depth: 3, level: 4 },
-      delay: { name: "Analog Delay", time_ms: 380, feedback: 4, level: 5 },
+      delay: { name: "Tape Delay", time_ms: 380, feedback: 4, level: 5 },
       reverb: { type: "Hall", decay: 6, tone: 5, level: 5 }
     },
     confidence: "high", notes: "Ambient 12-string shimmer. Two-guitar harmony solo — dial up the overdrive slightly."
@@ -1019,17 +1132,17 @@ const SONGS = [
   {
     song: "seven nation army", artist: "the white stripes",
     rhythm: {
-      preset: "Tweed", gain: 5, treble: 5, bass: 8, volume: 7, master: 6, fx: 5,
+      preset: "'57 Champ", gain: 5, treble: 5, bass: 8, volume: 7, master: 6, fx: 5,
       stompbox: { name: "None" },
       modulation: { name: "None" },
-      delay: { name: "Digital Delay", time_ms: 800, feedback: 4, level: 6 },
+      delay: { name: "Mono Delay", time_ms: 800, feedback: 4, level: 6 },
       reverb: { type: "Room", decay: 3, tone: 4, level: 3 }
     },
     solo: {
-      preset: "Tweed", gain: 6, treble: 6, bass: 7, volume: 8, master: 7, fx: 5,
-      stompbox: { name: "Overdrive", level: 7, gain: 5, tone: 5 },
+      preset: "'57 Champ", gain: 6, treble: 6, bass: 7, volume: 8, master: 7, fx: 5,
+      stompbox: { name: "Vintage Drive", level: 7, gain: 5, tone: 5 },
       modulation: { name: "None" },
-      delay: { name: "Digital Delay", time_ms: 800, feedback: 4, level: 5 },
+      delay: { name: "Mono Delay", time_ms: 800, feedback: 4, level: 5 },
       reverb: { type: "Room", decay: 3, tone: 4, level: 3 }
     },
     confidence: "high", notes: "The long delay creates the octave-drop illusion. Bass-heavy for maximum stomp."
@@ -1037,15 +1150,15 @@ const SONGS = [
   {
     song: "basket case", artist: "green day",
     rhythm: {
-      preset: "JCM", gain: 7, treble: 7, bass: 6, volume: 7, master: 7, fx: 3,
+      preset: "British 800", gain: 7, treble: 7, bass: 6, volume: 7, master: 7, fx: 3,
       stompbox: { name: "None" },
       modulation: { name: "None" },
       delay: { name: "None" },
       reverb: { type: "Room", decay: 2, tone: 5, level: 2 }
     },
     solo: {
-      preset: "JCM", gain: 8, treble: 7, bass: 6, volume: 8, master: 7, fx: 4,
-      stompbox: { name: "Overdrive", level: 6, gain: 4, tone: 6 },
+      preset: "British 800", gain: 8, treble: 7, bass: 6, volume: 8, master: 7, fx: 4,
+      stompbox: { name: "Vintage Drive", level: 6, gain: 4, tone: 6 },
       modulation: { name: "None" },
       delay: { name: "None" },
       reverb: { type: "Room", decay: 2, tone: 5, level: 2 }
@@ -1055,14 +1168,14 @@ const SONGS = [
   {
     song: "good riddance", artist: "green day",
     rhythm: {
-      preset: "Clean Twin", gain: 2, treble: 6, bass: 5, volume: 5, master: 5, fx: 3,
+      preset: "'65 Twin Reverb", gain: 2, treble: 6, bass: 5, volume: 5, master: 5, fx: 3,
       stompbox: { name: "None" },
       modulation: { name: "None" },
       delay: { name: "None" },
       reverb: { type: "Spring", decay: 3, tone: 5, level: 3 }
     },
     solo: {
-      preset: "Clean Twin", gain: 2, treble: 6, bass: 5, volume: 5, master: 5, fx: 3,
+      preset: "'65 Twin Reverb", gain: 2, treble: 6, bass: 5, volume: 5, master: 5, fx: 3,
       stompbox: { name: "None" },
       modulation: { name: "None" },
       delay: { name: "None" },
@@ -1073,15 +1186,15 @@ const SONGS = [
   {
     song: "black hole sun", artist: "soundgarden",
     rhythm: {
-      preset: "JCM", gain: 6, treble: 5, bass: 6, volume: 6, master: 6, fx: 6,
+      preset: "British 800", gain: 6, treble: 5, bass: 6, volume: 6, master: 6, fx: 6,
       stompbox: { name: "None" },
       modulation: { name: "Chorus", rate: 2, depth: 6, level: 6 },
       delay: { name: "None" },
       reverb: { type: "Hall", decay: 6, tone: 4, level: 6 }
     },
     solo: {
-      preset: "JCM", gain: 7, treble: 6, bass: 6, volume: 7, master: 7, fx: 6,
-      stompbox: { name: "Overdrive", level: 6, gain: 4, tone: 5 },
+      preset: "British 800", gain: 7, treble: 6, bass: 6, volume: 7, master: 7, fx: 6,
+      stompbox: { name: "Vintage Drive", level: 6, gain: 4, tone: 5 },
       modulation: { name: "Chorus", rate: 2, depth: 5, level: 5 },
       delay: { name: "None" },
       reverb: { type: "Hall", decay: 6, tone: 4, level: 6 }
@@ -1091,15 +1204,15 @@ const SONGS = [
   {
     song: "creep", artist: "radiohead",
     rhythm: {
-      preset: "Clean Twin", gain: 3, treble: 6, bass: 5, volume: 6, master: 5, fx: 5,
+      preset: "'65 Twin Reverb", gain: 3, treble: 6, bass: 5, volume: 6, master: 5, fx: 5,
       stompbox: { name: "None" },
       modulation: { name: "None" },
       delay: { name: "None" },
       reverb: { type: "Hall", decay: 5, tone: 5, level: 5 }
     },
     solo: {
-      preset: "Clean Twin", gain: 3, treble: 6, bass: 5, volume: 6, master: 5, fx: 5,
-      stompbox: { name: "Distortion", level: 8, gain: 7, tone: 5 },
+      preset: "'65 Twin Reverb", gain: 3, treble: 6, bass: 5, volume: 6, master: 5, fx: 5,
+      stompbox: { name: "Black Op Dist", level: 8, gain: 7, tone: 5 },
       modulation: { name: "None" },
       delay: { name: "None" },
       reverb: { type: "Hall", decay: 5, tone: 5, level: 5 }
@@ -1109,14 +1222,14 @@ const SONGS = [
   {
     song: "folsom prison blues", artist: "johnny cash",
     rhythm: {
-      preset: "Tweed", gain: 3, treble: 5, bass: 6, volume: 6, master: 5, fx: 3,
+      preset: "'57 Champ", gain: 3, treble: 5, bass: 6, volume: 6, master: 5, fx: 3,
       stompbox: { name: "None" },
       modulation: { name: "None" },
       delay: { name: "None" },
       reverb: { type: "Spring", decay: 3, tone: 4, level: 3 }
     },
     solo: {
-      preset: "Tweed", gain: 4, treble: 6, bass: 6, volume: 7, master: 5, fx: 3,
+      preset: "'57 Champ", gain: 4, treble: 6, bass: 6, volume: 7, master: 5, fx: 3,
       stompbox: { name: "None" },
       modulation: { name: "None" },
       delay: { name: "None" },
@@ -1128,36 +1241,36 @@ const SONGS = [
 
 const GENRE_PRESETS = {
   metal: {
-    rhythm: { preset: "Metal 2000", gain: 9, treble: 7, bass: 8, volume: 7, master: 7, fx: 3, stompbox: { name: "None" }, modulation: { name: "None" }, delay: { name: "None" }, reverb: { type: "Room", decay: 2, tone: 5, level: 2 } },
-    solo:   { preset: "Metal 2000", gain: 9, treble: 8, bass: 7, volume: 8, master: 8, fx: 5, stompbox: { name: "Overdrive", level: 7, gain: 4, tone: 7 }, modulation: { name: "None" }, delay: { name: "Digital Delay", time_ms: 280, feedback: 3, level: 4 }, reverb: { type: "Room", decay: 3, tone: 5, level: 3 } }
+    rhythm: { preset: "Full Moon Distortion", gain: 9, treble: 7, bass: 8, volume: 7, master: 7, fx: 3, stompbox: { name: "None" }, modulation: { name: "None" }, delay: { name: "None" }, reverb: { type: "Room", decay: 2, tone: 5, level: 2 } },
+    solo:   { preset: "Full Moon Distortion", gain: 9, treble: 8, bass: 7, volume: 8, master: 8, fx: 5, stompbox: { name: "Vintage Drive", level: 7, gain: 4, tone: 7 }, modulation: { name: "None" }, delay: { name: "Mono Delay", time_ms: 280, feedback: 3, level: 4 }, reverb: { type: "Room", decay: 3, tone: 5, level: 3 } }
   },
   rock: {
-    rhythm: { preset: "JCM", gain: 6, treble: 6, bass: 6, volume: 7, master: 6, fx: 4, stompbox: { name: "None" }, modulation: { name: "None" }, delay: { name: "None" }, reverb: { type: "Room", decay: 3, tone: 5, level: 3 } },
-    solo:   { preset: "JCM", gain: 7, treble: 7, bass: 6, volume: 8, master: 7, fx: 5, stompbox: { name: "Overdrive", level: 7, gain: 4, tone: 6 }, modulation: { name: "None" }, delay: { name: "Analog Delay", time_ms: 300, feedback: 3, level: 4 }, reverb: { type: "Room", decay: 4, tone: 5, level: 4 } }
+    rhythm: { preset: "British 800", gain: 6, treble: 6, bass: 6, volume: 7, master: 6, fx: 4, stompbox: { name: "None" }, modulation: { name: "None" }, delay: { name: "None" }, reverb: { type: "Room", decay: 3, tone: 5, level: 3 } },
+    solo:   { preset: "British 800", gain: 7, treble: 7, bass: 6, volume: 8, master: 7, fx: 5, stompbox: { name: "Vintage Drive", level: 7, gain: 4, tone: 6 }, modulation: { name: "None" }, delay: { name: "Tape Delay", time_ms: 300, feedback: 3, level: 4 }, reverb: { type: "Room", decay: 4, tone: 5, level: 4 } }
   },
   blues: {
-    rhythm: { preset: "Texas Crunch", gain: 5, treble: 6, bass: 6, volume: 7, master: 6, fx: 4, stompbox: { name: "None" }, modulation: { name: "None" }, delay: { name: "None" }, reverb: { type: "Spring", decay: 4, tone: 5, level: 4 } },
-    solo:   { preset: "Texas Crunch", gain: 6, treble: 7, bass: 5, volume: 8, master: 7, fx: 5, stompbox: { name: "Overdrive", level: 6, gain: 3, tone: 7 }, modulation: { name: "None" }, delay: { name: "None" }, reverb: { type: "Spring", decay: 5, tone: 5, level: 5 } }
+    rhythm: { preset: "Blues Jr", gain: 5, treble: 6, bass: 6, volume: 7, master: 6, fx: 4, stompbox: { name: "None" }, modulation: { name: "None" }, delay: { name: "None" }, reverb: { type: "Spring", decay: 4, tone: 5, level: 4 } },
+    solo:   { preset: "Blues Jr", gain: 6, treble: 7, bass: 5, volume: 8, master: 7, fx: 5, stompbox: { name: "Vintage Drive", level: 6, gain: 3, tone: 7 }, modulation: { name: "None" }, delay: { name: "None" }, reverb: { type: "Spring", decay: 5, tone: 5, level: 5 } }
   },
   country: {
-    rhythm: { preset: "Clean Twin", gain: 2, treble: 7, bass: 5, volume: 6, master: 5, fx: 3, stompbox: { name: "None" }, modulation: { name: "None" }, delay: { name: "None" }, reverb: { type: "Spring", decay: 3, tone: 6, level: 4 } },
-    solo:   { preset: "Clean Twin", gain: 3, treble: 7, bass: 5, volume: 7, master: 5, fx: 4, stompbox: { name: "Boost", level: 7, gain: 3, tone: 7 }, modulation: { name: "None" }, delay: { name: "Analog Delay", time_ms: 280, feedback: 3, level: 4 }, reverb: { type: "Spring", decay: 4, tone: 6, level: 4 } }
+    rhythm: { preset: "'65 Twin Reverb", gain: 2, treble: 7, bass: 5, volume: 6, master: 5, fx: 3, stompbox: { name: "None" }, modulation: { name: "None" }, delay: { name: "None" }, reverb: { type: "Spring", decay: 3, tone: 6, level: 4 } },
+    solo:   { preset: "'65 Twin Reverb", gain: 3, treble: 7, bass: 5, volume: 7, master: 5, fx: 4, stompbox: { name: "Ranger Boost", level: 7, gain: 3, tone: 7 }, modulation: { name: "None" }, delay: { name: "Tape Delay", time_ms: 280, feedback: 3, level: 4 }, reverb: { type: "Spring", decay: 4, tone: 6, level: 4 } }
   },
   jazz: {
-    rhythm: { preset: "Champ", gain: 1, treble: 3, bass: 7, volume: 5, master: 4, fx: 3, stompbox: { name: "None" }, modulation: { name: "None" }, delay: { name: "None" }, reverb: { type: "Hall", decay: 4, tone: 3, level: 4 } },
-    solo:   { preset: "Champ", gain: 2, treble: 4, bass: 7, volume: 6, master: 5, fx: 4, stompbox: { name: "None" }, modulation: { name: "None" }, delay: { name: "None" }, reverb: { type: "Hall", decay: 5, tone: 3, level: 5 } }
+    rhythm: { preset: "'57 Champ", gain: 1, treble: 3, bass: 7, volume: 5, master: 4, fx: 3, stompbox: { name: "None" }, modulation: { name: "None" }, delay: { name: "None" }, reverb: { type: "Hall", decay: 4, tone: 3, level: 4 } },
+    solo:   { preset: "'57 Champ", gain: 2, treble: 4, bass: 7, volume: 6, master: 5, fx: 4, stompbox: { name: "None" }, modulation: { name: "None" }, delay: { name: "None" }, reverb: { type: "Hall", decay: 5, tone: 3, level: 5 } }
   },
   punk: {
-    rhythm: { preset: "American Steel", gain: 8, treble: 7, bass: 6, volume: 8, master: 7, fx: 2, stompbox: { name: "None" }, modulation: { name: "None" }, delay: { name: "None" }, reverb: { type: "Room", decay: 2, tone: 5, level: 2 } },
-    solo:   { preset: "American Steel", gain: 8, treble: 7, bass: 6, volume: 8, master: 8, fx: 3, stompbox: { name: "Overdrive", level: 7, gain: 4, tone: 6 }, modulation: { name: "None" }, delay: { name: "None" }, reverb: { type: "Room", decay: 2, tone: 5, level: 2 } }
+    rhythm: { preset: "Super-Sonic", gain: 8, treble: 7, bass: 6, volume: 8, master: 7, fx: 2, stompbox: { name: "None" }, modulation: { name: "None" }, delay: { name: "None" }, reverb: { type: "Room", decay: 2, tone: 5, level: 2 } },
+    solo:   { preset: "Super-Sonic", gain: 8, treble: 7, bass: 6, volume: 8, master: 8, fx: 3, stompbox: { name: "Vintage Drive", level: 7, gain: 4, tone: 6 }, modulation: { name: "None" }, delay: { name: "None" }, reverb: { type: "Room", decay: 2, tone: 5, level: 2 } }
   },
   pop: {
-    rhythm: { preset: "Clean Twin", gain: 3, treble: 6, bass: 5, volume: 6, master: 5, fx: 5, stompbox: { name: "None" }, modulation: { name: "Chorus", rate: 3, depth: 4, level: 5 }, delay: { name: "None" }, reverb: { type: "Hall", decay: 4, tone: 5, level: 5 } },
-    solo:   { preset: "Clean Twin", gain: 4, treble: 7, bass: 5, volume: 7, master: 5, fx: 5, stompbox: { name: "Overdrive", level: 6, gain: 4, tone: 6 }, modulation: { name: "Chorus", rate: 3, depth: 3, level: 4 }, delay: { name: "None" }, reverb: { type: "Hall", decay: 4, tone: 5, level: 5 } }
+    rhythm: { preset: "'65 Twin Reverb", gain: 3, treble: 6, bass: 5, volume: 6, master: 5, fx: 5, stompbox: { name: "None" }, modulation: { name: "Chorus", rate: 3, depth: 4, level: 5 }, delay: { name: "None" }, reverb: { type: "Hall", decay: 4, tone: 5, level: 5 } },
+    solo:   { preset: "'65 Twin Reverb", gain: 4, treble: 7, bass: 5, volume: 7, master: 5, fx: 5, stompbox: { name: "Vintage Drive", level: 6, gain: 4, tone: 6 }, modulation: { name: "Chorus", rate: 3, depth: 3, level: 4 }, delay: { name: "None" }, reverb: { type: "Hall", decay: 4, tone: 5, level: 5 } }
   },
   default: {
-    rhythm: { preset: "Clean Twin", gain: 5, treble: 6, bass: 6, volume: 6, master: 5, fx: 4, stompbox: { name: "None" }, modulation: { name: "None" }, delay: { name: "None" }, reverb: { type: "Spring", decay: 3, tone: 5, level: 3 } },
-    solo:   { preset: "Clean Twin", gain: 6, treble: 6, bass: 6, volume: 7, master: 6, fx: 5, stompbox: { name: "Overdrive", level: 6, gain: 4, tone: 6 }, modulation: { name: "None" }, delay: { name: "Analog Delay", time_ms: 300, feedback: 3, level: 4 }, reverb: { type: "Spring", decay: 4, tone: 5, level: 4 } }
+    rhythm: { preset: "'65 Twin Reverb", gain: 5, treble: 6, bass: 6, volume: 6, master: 5, fx: 4, stompbox: { name: "None" }, modulation: { name: "None" }, delay: { name: "None" }, reverb: { type: "Spring", decay: 3, tone: 5, level: 3 } },
+    solo:   { preset: "'65 Twin Reverb", gain: 6, treble: 6, bass: 6, volume: 7, master: 6, fx: 5, stompbox: { name: "Vintage Drive", level: 6, gain: 4, tone: 6 }, modulation: { name: "None" }, delay: { name: "Tape Delay", time_ms: 300, feedback: 3, level: 4 }, reverb: { type: "Spring", decay: 4, tone: 5, level: 4 } }
   }
 };
 
@@ -1281,6 +1394,7 @@ function lookupTone(song, artist) {
     document.getElementById('presetValue').textContent = d.preset || '—';
     document.getElementById('btnRhythm').classList.toggle('active', mode === 'rhythm');
     document.getElementById('btnSolo').classList.toggle('active', mode === 'solo');
+    document.getElementById('btnBoth').classList.toggle('active', false);
 
     setTimeout(() => {
       setKnob('gain',   d.gain   ?? 5);
@@ -1295,11 +1409,79 @@ function lookupTone(song, artist) {
     setEffect('fx-mod',   'fx-mod-name',   'fx-mod-params',   d.modulation);
     setEffect('fx-delay', 'fx-delay-name', 'fx-delay-params', d.delay);
     setEffect('fx-rev',   'fx-rev-name',   'fx-rev-params',   d.reverb);
+
+    // Show knob panel, hide both view
+    document.getElementById('ampPanel').querySelector('.knobs-section').style.display = '';
+    document.getElementById('ampPanel').querySelector('.effects-section').style.display = '';
+    document.getElementById('bothView').classList.remove('visible');
+  }
+
+  function renderBothColKnobs(colId, d) {
+    const knobs = [
+      { id: 'gain', label: 'Gain', val: d.gain },
+      { id: 'treble', label: 'Treble', val: d.treble },
+      { id: 'bass', label: 'Bass', val: d.bass },
+      { id: 'volume', label: 'Volume', val: d.volume },
+      { id: 'master', label: 'Master', val: d.master },
+      { id: 'fx', label: 'FX', val: d.fx }
+    ];
+    document.getElementById(colId).innerHTML = knobs.map(k =>
+      `<div class="both-knob-item">
+        <div class="both-knob-val">${k.val ?? '—'}</div>
+        <div class="both-knob-name">${k.label}</div>
+      </div>`
+    ).join('');
+  }
+
+  function renderBothColFx(colId, d) {
+    const effects = [
+      { type: 'Stompbox', obj: d.stompbox },
+      { type: 'Modulation', obj: d.modulation },
+      { type: 'Delay', obj: d.delay },
+      { type: 'Reverb', obj: d.reverb }
+    ];
+    document.getElementById(colId).innerHTML = effects.map(e => {
+      const obj = e.obj || {};
+      const name = obj.name || obj.type || 'None';
+      const isActive = name !== 'None' && name;
+      const params = isActive ? fxParams(obj) : '';
+      return `<div class="both-fx-item${isActive ? ' active' : ''}">
+        <div class="both-fx-type">${e.type}</div>
+        <div class="both-fx-name">${name || 'None'}</div>
+        ${params ? `<div class="both-fx-params">${params}</div>` : ''}
+      </div>`;
+    }).join('');
+  }
+
+  function renderBothMode() {
+    if (!currentData) return;
+    const r = currentData.rhythm;
+    const s = currentData.solo;
+
+    document.getElementById('btnRhythm').classList.remove('active');
+    document.getElementById('btnSolo').classList.remove('active');
+    document.getElementById('btnBoth').classList.add('active');
+
+    // Hide regular knob/effects sections, show both view
+    document.getElementById('ampPanel').querySelector('.knobs-section').style.display = 'none';
+    document.getElementById('ampPanel').querySelector('.effects-section').style.display = 'none';
+    document.getElementById('bothView').classList.add('visible');
+
+    document.getElementById('b-full-preset').textContent = r.preset || '—';
+    document.getElementById('b-solo-preset').textContent = s.preset || '—';
+    renderBothColKnobs('b-full-knobs', r);
+    renderBothColKnobs('b-solo-knobs', s);
+    renderBothColFx('b-full-fx', r);
+    renderBothColFx('b-solo-fx', s);
   }
 
   function setMode(mode) {
     currentMode = mode;
-    applyMode(mode);
+    if (mode === 'both') {
+      renderBothMode();
+    } else {
+      applyMode(mode);
+    }
   }
 
   function renderSettings(data) {
@@ -1316,9 +1498,15 @@ function lookupTone(song, artist) {
     document.getElementById('toneNotes').textContent = data.notes || '—';
     document.getElementById('ampPanel').classList.add('visible');
 
-    // Reset toggle to Rhythm
+    // Restore knob/effects visibility
+    document.getElementById('ampPanel').querySelector('.knobs-section').style.display = '';
+    document.getElementById('ampPanel').querySelector('.effects-section').style.display = '';
+    document.getElementById('bothView').classList.remove('visible');
+
+    // Reset toggle to Full Song
     document.getElementById('btnRhythm').classList.add('active');
     document.getElementById('btnSolo').classList.remove('active');
+    document.getElementById('btnBoth').classList.remove('active');
 
     applyMode('rhythm');
   }
